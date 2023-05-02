@@ -1,0 +1,11 @@
+{
+  "name": "GitToolNew",
+  "version": "1.0.0",
+  "description": "A visualization tool to show the Git objects and their relationship.",
+  "main": "index.js",
+  "author": "Shuyu Liu",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.4"
+  }
+}

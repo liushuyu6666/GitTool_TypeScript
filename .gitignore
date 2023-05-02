@@ -1,0 +1,15 @@
+# Dependecy directories
+node_modules/
+
+# local .env
+.env.localhost.*
+.env.local
+
+# compiled files
+build/
+
+# gitTest
+gitTest/
+
+# out dir
+outDir/
