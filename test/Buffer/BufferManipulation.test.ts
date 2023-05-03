@@ -1,4 +1,4 @@
-import { BufferManipulation } from "../../src/BufferManipulation/BufferManipulation";
+import { BufferManipulation } from "../../src/Buffer/BufferManipulation";
 
 describe("Test BufferManipulation class", () => {
     let bufferManipulation: BufferManipulation;
