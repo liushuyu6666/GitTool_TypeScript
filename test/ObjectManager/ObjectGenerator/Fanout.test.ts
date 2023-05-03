@@ -11,7 +11,7 @@ describe("Test the offset in the Fanout class:", () => {
     const infoPackedFilePaths = path.join(infoRoot, 'packedFilePaths.json');
     const infoOffset = path.join(infoRoot, 'offset.json');
     const packedFilePaths = JSON.parse(readFileSync(infoPackedFilePaths, 'utf8'));
-    const expectedOffsets: Record<string, string[]> = JSON.parse(readFileSync(infoOffset, 'utf8'));
+    const expectedOffsets: Record<string, Record<string, number>> = JSON.parse(readFileSync(infoOffset, 'utf8'));
 
     describe("The fanout table in the first .idx file", () => {
         const packedFilePath: string = packedFilePaths[0];
