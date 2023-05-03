@@ -15,147 +15,147 @@ export const BYTE_POWER = Math.pow(2, 8);
  * put in front of variable_a, The answer becomes 0000(1100, 01110100).
  */
 export interface BufferManipulationInterface {
-  stock: Buffer;
+    stock: Buffer;
 
-  /*
-    If isBE = true: shuttle stores from left to right.
-    If isBE = false: shuttle stores from right to left.
-  */
-  shuttle: number;
+    /*
+      If isBE = true: shuttle stores from left to right.
+      If isBE = false: shuttle stores from right to left.
+    */
+    shuttle: number;
 
-  capacityOfShuttle: number;
+    capacityOfShuttle: number;
 
-  /*
-    true: For byte1, byte2, byte3, it stores as (Big) byte1 byte2 byte3.
-    false: For byte1, byte2, byte3, it stores as (Big) byte3 byte2 byte1.
-  */
-  isBE: boolean;
+    /*
+      true: For byte1, byte2, byte3, it stores as (Big) byte1 byte2 byte3.
+      false: For byte1, byte2, byte3, it stores as (Big) byte3 byte2 byte1.
+    */
+    isBE: boolean;
 
-  cleanTheShuttleTail(): void;
+    cleanTheShuttleTail(): void;
 
-  assertShuttleIsByte(): void;
+    assertShuttleIsByte(): void;
 
-  fill(value: number, startIndex: number, endIndex: number): void;
+    fill(value: number, startIndex: number, endIndex: number): void;
 
-  finish(): void;
+    finish(): void;
 
-  clean(): void;
+    clean(): void;
 
-  readIntBE(): number;
+    readIntBE(): number;
 }
 
 // TODO: need setter and getter
 export class BufferManipulation implements BufferManipulationInterface {
-  stock: Buffer;
+    stock: Buffer;
 
-  shuttle: number;
+    shuttle: number;
 
-  capacityOfShuttle: number;
+    capacityOfShuttle: number;
 
-  isBE: boolean;
+    isBE: boolean;
 
-  constructor(isBE: boolean) {
-    this.stock = Buffer.alloc(0);
+    constructor(isBE: boolean) {
+        this.stock = Buffer.alloc(0);
 
-    this.shuttle = 0x00; // one byte
+        this.shuttle = 0x00; // one byte
 
-    this.capacityOfShuttle = 8;
+        this.capacityOfShuttle = 8;
 
-    this.isBE = isBE;
-  }
-
-  cleanTheShuttleTail() {
-    // precedent:
-    // >> or <<
-    // & or |
-    this.shuttle = this.isBE
-      ? (((this.shuttle >> this.capacityOfShuttle) & 0x0ff) <<
-          this.capacityOfShuttle) &
-        0xff
-      : (((this.shuttle << this.capacityOfShuttle) & 0x0ff) >>
-          this.capacityOfShuttle) &
-        0xff;
-  }
-
-  assertShuttleIsByte() {
-    if (this.shuttle > 0xff)
-      throw new Error(
-        '[ManipulateBuffer error]: shuttle contains more that one byte',
-      );
-  }
-
-  // start from 0 and end at 8.
-  // startIndex is inclusive and endIndex is exclusive.
-  fill(value: number, startIndex: number, endIndex: number) {
-    if (startIndex > endIndex || startIndex < 0 || endIndex > 8) {
-      throw new Error(
-        `[ManipulateBuffer error]: startIndex or endIndex is illegal`,
-      );
+        this.isBE = isBE;
     }
 
-    const validSize = endIndex - startIndex;
-
-    // clear value
-    value = this.isBE
-      ? // value should be left alignment, like xxxxx000 (x is the valid bit).
-        (((value >> (8 - endIndex)) & 0xff) << (8 - endIndex + startIndex)) &
-        0xff
-      : // value should be right alignment, like 000xxxxx (x is the valid bit).
-        (((value << startIndex) & 0xff) >> (8 - endIndex + startIndex)) & 0xff;
-    value = value & 0xff; // ensure only lowest 8 bits are left.
-
-    // bits left after loading
-    const toBeLeft = this.isBE
-      ? (value << this.capacityOfShuttle) & 0xff // toBeLeft should be left alignment, like xxx00000 (x is the valid bit).
-      : (value >> this.capacityOfShuttle) & 0xff; // toBeLeft should be right alignment, like 00000xxx (x is the valid bit).
-    const newValidSize = Math.max(0, validSize - this.capacityOfShuttle); // no bit left if it is 0
-
-    this.cleanTheShuttleTail();
-
-    // load value to the shuttle
-    const toBeLoaded =
-      (this.isBE
-        ? value >> (8 - this.capacityOfShuttle)
-        : value << (8 - this.capacityOfShuttle)) & 0xff;
-    this.shuttle = this.shuttle | toBeLoaded;
-    this.capacityOfShuttle = Math.max(0, this.capacityOfShuttle - validSize); // new capacity size
-
-    this.cleanTheShuttleTail();
-
-    this.assertShuttleIsByte();
-
-    // append shuttle to the stock if necessary and build new shuttle
-    if (this.capacityOfShuttle === 0) {
-      const uint8 = new Uint8Array([this.shuttle]);
-      this.stock = this.isBE
-        ? Buffer.concat([this.stock, uint8], this.stock.length + uint8.length) // stock grows from left to right.
-        : Buffer.concat([uint8, this.stock], this.stock.length + uint8.length); // stock grows from right to left.
-      this.shuttle = toBeLeft;
-      this.capacityOfShuttle = 8 - newValidSize;
+    cleanTheShuttleTail() {
+        // precedent:
+        // >> or <<
+        // & or |
+        this.shuttle = this.isBE
+            ? (((this.shuttle >> this.capacityOfShuttle) & 0x0ff) <<
+                this.capacityOfShuttle) &
+                0xff
+            : (((this.shuttle << this.capacityOfShuttle) & 0x0ff) >>
+                this.capacityOfShuttle) &
+                0xff;
     }
-  }
 
-  clean() {
-    this.stock = Buffer.alloc(0);
-    this.shuttle = 0b00000000;
-    this.capacityOfShuttle = 8;
-  }
-
-  finish() {
-    const rightLeft = this.capacityOfShuttle;
-    this.fill(0b00000000, 0, this.capacityOfShuttle);
-
-    if (this.isBE) {
-      buffershift.shr(this.stock, rightLeft);
+    assertShuttleIsByte() {
+        if (this.shuttle > 0xff)
+        throw new Error(
+            '[ManipulateBuffer error]: shuttle contains more that one byte',
+        );
     }
-  }
 
-  readIntBE(): number {
-    let final: number = 0;
-    for (const [_, value] of this.stock.entries()) {
-      final = final * BYTE_POWER + value;
+    // start from 0 and end at 8.
+    // startIndex is inclusive and endIndex is exclusive.
+    fill(value: number, startIndex: number, endIndex: number) {
+        if (startIndex > endIndex || startIndex < 0 || endIndex > 8) {
+        throw new Error(
+            `[ManipulateBuffer error]: startIndex or endIndex is illegal`,
+        );
+        }
+
+        const validSize = endIndex - startIndex;
+
+        // clear value
+        value = this.isBE
+            ? // value should be left alignment, like xxxxx000 (x is the valid bit).
+                (((value >> (8 - endIndex)) & 0xff) << (8 - endIndex + startIndex)) &
+                0xff
+            : // value should be right alignment, like 000xxxxx (x is the valid bit).
+                (((value << startIndex) & 0xff) >> (8 - endIndex + startIndex)) & 0xff;
+        value = value & 0xff; // ensure only lowest 8 bits are left.
+
+        // bits left after loading
+        const toBeLeft = this.isBE
+            ? (value << this.capacityOfShuttle) & 0xff // toBeLeft should be left alignment, like xxx00000 (x is the valid bit).
+            : (value >> this.capacityOfShuttle) & 0xff; // toBeLeft should be right alignment, like 00000xxx (x is the valid bit).
+        const newValidSize = Math.max(0, validSize - this.capacityOfShuttle); // no bit left if it is 0
+
+        this.cleanTheShuttleTail();
+
+        // load value to the shuttle
+        const toBeLoaded =
+        (this.isBE
+            ? value >> (8 - this.capacityOfShuttle)
+            : value << (8 - this.capacityOfShuttle)) & 0xff;
+        this.shuttle = this.shuttle | toBeLoaded;
+        this.capacityOfShuttle = Math.max(0, this.capacityOfShuttle - validSize); // new capacity size
+
+        this.cleanTheShuttleTail();
+
+        this.assertShuttleIsByte();
+
+        // append shuttle to the stock if necessary and build new shuttle
+        if (this.capacityOfShuttle === 0) {
+            const uint8 = new Uint8Array([this.shuttle]);
+            this.stock = this.isBE
+                ? Buffer.concat([this.stock, uint8], this.stock.length + uint8.length) // stock grows from left to right.
+                : Buffer.concat([uint8, this.stock], this.stock.length + uint8.length); // stock grows from right to left.
+            this.shuttle = toBeLeft;
+            this.capacityOfShuttle = 8 - newValidSize;
+        }
     }
-    return final;
-  }
+
+    clean() {
+        this.stock = Buffer.alloc(0);
+        this.shuttle = 0b00000000;
+        this.capacityOfShuttle = 8;
+    }
+
+    finish() {
+        const rightLeft = this.capacityOfShuttle;
+        this.fill(0b00000000, 0, this.capacityOfShuttle);
+
+        if (this.isBE) {
+            buffershift.shr(this.stock, rightLeft);
+        }
+    }
+
+    readIntBE(): number {
+        let final: number = 0;
+        for (const [_, value] of this.stock.entries()) {
+            final = final * BYTE_POWER + value;
+        }
+        return final;
+    }
 }
 

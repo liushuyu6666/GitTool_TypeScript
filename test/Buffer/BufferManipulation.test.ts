@@ -64,6 +64,14 @@ describe("Test BufferManipulation class", () => {
                 Buffer.from([0b00111101, 0b01010010, 0b10111111]),
             );
         });
+
+        test('The finish method should load the shuttle to the stock and right shift the stock when the shuttle is not full', () => {
+            bufferManipulation.fill(0b10101101, 4, 8); // 0bxxxx1101
+            bufferManipulation.finish();
+
+            expect(bufferManipulation.shuttle).toBe(0b00000000);
+            expect(bufferManipulation.stock).toEqual(Buffer.from([0b00001101]));
+        })
     
         test('The finish method should load all left valid bits in the shuttle to the stock.', () => {
             bufferManipulation.fill(0b10100111, 3, 8); // 0bxxx00111
@@ -78,7 +86,7 @@ describe("Test BufferManipulation class", () => {
             expect(bufferManipulation.shuttle).toBe(0b00000000); // left alignment
             expect(bufferManipulation.capacityOfShuttle).toBe(8);
             expect(bufferManipulation.stock).toEqual(
-                Buffer.from([0b00000011, 0b11010101, 0b00101011, 0b11110110]),
+                Buffer.from([0b00000011, 0b11010101, 0b00101011, 0b11110110])
             );
         });
     
