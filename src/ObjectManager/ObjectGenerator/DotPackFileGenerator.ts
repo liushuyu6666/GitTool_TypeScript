@@ -10,6 +10,14 @@ export interface Entry {
 
     size: number;
 
+    /**
+     * This is the start point of all delta objects, which consists of msb, type, length(size), (may or may not) base object info and compressed data.
+     */
+    offsetIndex: number;
+
+    /**
+     * For undeltified objects (blob_delta, tree_delta, commit_delta), the body is the compressed data. For deltified objects (ofs_delta, ref_delta), the body consists of base object info and compressed data.
+     */
     bodyStartIndex: number;
 
     bodyEndIndex: number;
@@ -107,7 +115,7 @@ export class DotPackFileGenerator implements DotPackFileGeneratorInterface {
             const endIndex = offsetArray[i + 1].offset;
             const hex = offsetArray[i].hex;
             const entry = this._getEntry(content, startIndex, endIndex);
-            gitPackObjectEntry[hex] = entry;
+            gitPackObjectEntry[hex] = {...entry, offsetIndex: startIndex};
         }
         return gitPackObjectEntry;
     }
@@ -116,7 +124,7 @@ export class DotPackFileGenerator implements DotPackFileGeneratorInterface {
         return content.subarray(content.length - 20);
     }
 
-    private _getEntry(content: Buffer, startIndex: number, endIndex: number): Entry {
+    private _getEntry(content: Buffer, startIndex: number, endIndex: number): Omit<Entry, "offsetIndex"> {
         const chunk = content.subarray(startIndex, endIndex);
         const bv = new BufferVarint();
         const [[size, bodyStartIndex], typeNumber] = bv.getFirstVarintWithType(chunk);

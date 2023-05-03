@@ -3,18 +3,21 @@
         "3b18e512dba79e4c8300dd08aeb37f8e728b8dad": {
             "bodyEndIndex": 159,
             "bodyStartIndex": 139,
+            "offsetIndex": 138,
             "size": 12,
             "type": "blob_delta"
         },
         "c17358365df785db682260407606051b011eee88": {
             "bodyEndIndex": 138,
             "bodyStartIndex": 14,
+            "offsetIndex": 12,
             "size": 1163,
             "type": "commit_delta"
         },
         "c3b8bb102afeca86037d5b5dd89ceeb0090eae9d": {
             "bodyEndIndex": 206,
             "bodyStartIndex": 161,
+            "offsetIndex": 159,
             "size": 514,
             "type": "tree_delta"
         }
@@ -23,54 +26,63 @@
             "00fea2f4d78299c796a53ecbd9b59938a97e6d67": {
             "bodyEndIndex": 396,
             "bodyStartIndex": 327,
+            "offsetIndex": 325,
             "size": 1668,
             "type": "blob_delta"
         },
             "08c5082aa833173f6fe08a6ffaa05bf49322b6cd": {
             "bodyEndIndex": 518,
             "bodyStartIndex": 444,
+            "offsetIndex": 442,
             "size": 260,
             "type": "tree_delta"
         },
             "2129cac3bcef43797f755ba6105c32d4a3f1ace0": {
             "bodyEndIndex": 737,
             "bodyStartIndex": 688,
+            "offsetIndex": 686,
             "size": 387,
             "type": "blob_delta"
         },
             "326ae25c4e61cba56782e9e37a19d0bbcf9b694e": {
             "bodyEndIndex": 686,
             "bodyStartIndex": 642,
+            "offsetIndex": 640,
             "size": 386,
             "type": "tree_delta"
         },
             "7c556ca93b467f8f8247acf522915f2f9e048eb5": {
             "bodyEndIndex": 174,
             "bodyStartIndex": 14,
+            "offsetIndex": 12,
             "size": 271,
             "type": "commit_delta"
         },
             "a5e8ef5f17e278727d3f18a309cba4be8f6ba2c8": {
             "bodyEndIndex": 640,
             "bodyStartIndex": 566,
+            "offsetIndex": 564,
             "size": 260,
             "type": "tree_delta"
         },
             "cfa7f29b1f343be510053c499f717e0c23f4dba0": {
             "bodyEndIndex": 564,
             "bodyStartIndex": 520,
+            "offsetIndex": 518,
             "size": 386,
             "type": "tree_delta"
         },
             "d44f8c06583e525e7885ec701c04a067e061bd94": {
             "bodyEndIndex": 325,
             "bodyStartIndex": 176,
+            "offsetIndex": 174,
             "size": 14,
             "type": "commit_delta"
         },
             "fffbf73fb93d922f351ee5b7311e1edb1c76b427": {
             "bodyEndIndex": 442,
             "bodyStartIndex": 398,
+            "offsetIndex": 396,
             "size": 1922,
             "type": "blob_delta"
         }
