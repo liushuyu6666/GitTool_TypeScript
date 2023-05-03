@@ -1,5 +1,5 @@
 import { Fanout } from "../../../src/ObjectManager/ObjectGenerator/Fanout";
-import fs, { readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import path from 'path';
 
 describe("Test the offset in the Fanout class:", () => {
@@ -10,10 +10,10 @@ describe("Test the offset in the Fanout class:", () => {
     const infoRoot = 'testCases/example/info'; // The location of the example test case info.
     const infoPackedFilePaths = path.join(infoRoot, 'packedFilePaths.json');
     const infoOffset = path.join(infoRoot, 'offset.json');
-    const packedFilePaths = JSON.parse(fs.readFileSync(infoPackedFilePaths, 'utf8'));
-    const expectedOffsets: Record<string, string[]> = JSON.parse(fs.readFileSync(infoOffset, 'utf8'));
+    const packedFilePaths = JSON.parse(readFileSync(infoPackedFilePaths, 'utf8'));
+    const expectedOffsets: Record<string, string[]> = JSON.parse(readFileSync(infoOffset, 'utf8'));
 
-    describe("The first .idx file", () => {
+    describe("The fanout table in the first .idx file", () => {
         const packedFilePath: string = packedFilePaths[0];
         const hash = packedFilePath.substring(packedFilePath.lastIndexOf('/') + 1);
         const content = readFileSync(`${packedFilePath}.idx`);
@@ -27,7 +27,7 @@ describe("Test the offset in the Fanout class:", () => {
         })
     });
 
-    describe("The second .idx file", () => {
+    describe("The fanout table in the second .idx file", () => {
         const packedFilePath: string = packedFilePaths[1];
         const hash = packedFilePath.substring(packedFilePath.lastIndexOf('/') + 1);
         const content = readFileSync(`${packedFilePath}.idx`);
