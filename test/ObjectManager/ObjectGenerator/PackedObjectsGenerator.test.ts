@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import { PackedObjectsGenerator } from "../../../src/ObjectManager/ObjectGenerator/PackedObjectsGenerator"
 
 describe("Test PackedObjectsGenerator class", () => {
