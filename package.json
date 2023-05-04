@@ -17,6 +17,8 @@
     "test updateSnapshot": "jest --updateSnapshot"
   },
   "dependencies": {
-    "fs": "^0.0.1-security"
+    "dotenv": "^16.0.3",
+    "fs": "^0.0.1-security",
+    "mongodb": "^5.4.0"
   }
 }
