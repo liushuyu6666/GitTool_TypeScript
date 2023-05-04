@@ -99,4 +99,12 @@ export class ObjectManager {
         logMemoryUsage();
         return this._packMap;
     }
+
+    gitObjectToJson() {
+        const gitObjectJson: Object[] = [];
+        for (const gitObject of this.gitObjects) {
+            gitObjectJson.push(gitObject.toJson());
+        }
+        return gitObjectJson;
+    }
 }

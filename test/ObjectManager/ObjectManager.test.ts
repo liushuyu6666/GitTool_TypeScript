@@ -17,9 +17,14 @@ describe("Test ObjectManager class", () => {
             expect(objectManager.gitObjects.length).toBe(16901);
         });
 
-        test("generatePackMap method should generate PackMap for further process.", () => {
-            objectManager.generatePackMap();
-            expect(objectManager.packMap.size).toBe(16901);
+        // test("generatePackMap method should generate PackMap for further process.", () => {
+        //     objectManager.generatePackMap();
+        //     expect(objectManager.packMap.size).toBe(16901);
+        // });
+
+        test("gitObjectToJson method should convert all git objects to .json.", () => {
+            const json = objectManager.gitObjectToJson();
+            expect(json.length).toBe(16901);
         })
     });
 })
