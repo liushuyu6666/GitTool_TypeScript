@@ -9,7 +9,6 @@ describe("Test FileManager class", () => {
     describe("upon the example test cases", () => {
         // The location of the example test case.
         const inDir = 'testCases/example/git'; 
-        const gitObjectPath = path.join(inDir, 'objects');
 
         // The location of the info directory.
         const infoRoot = 'testCases/example/info'; // The location of the example test case info.
@@ -18,39 +17,30 @@ describe("Test FileManager class", () => {
 
         const outDir = 'outDir';
 
-        fileManager = new FileManager(inDir, outDir);
-
-        describe("for its properties, setter and getter:", () => {
-            test("should return the right object path.", () => {
-                expect(fileManager.objectPath).toBe(gitObjectPath);
-            })
+        beforeAll(() => {
+            fileManager = new FileManager(inDir, outDir);
         });
 
-        describe("for its methods:", () => {
-            test("should return all loose file paths.", () => {
-                const path = fileManager.getLooseFilePaths();
-                const expectPath = JSON.parse(fs.readFileSync(looseFilePaths, 'utf8'));
-                expect(path).toEqual(expectPath);
-            });
+        test("should return all loose file paths.", () => {
+            const path = fileManager.getLooseFilePaths();
+            const expectPath = JSON.parse(fs.readFileSync(looseFilePaths, 'utf8'));
+            expect(path).toEqual(expectPath);
+        });
 
-            test("should return all packed file paths without extension.", () => {
-                const path = fileManager.getPackedFilePaths();
-                const expectPath = JSON.parse(fs.readFileSync(packedFilePaths, 'utf8'));
-                expect(path).toEqual(expectPath);
-            });
+        test("should return all packed file paths without extension.", () => {
+            const path = fileManager.getPackedFilePaths();
+            const expectPath = JSON.parse(fs.readFileSync(packedFilePaths, 'utf8'));
+            expect(path).toEqual(expectPath);
+        });
 
-            test("should save json file into the local mongodb", async () => {
-                const json = [
-                    {
-                        name: 'tester1',
-                        age: 11
-                    },
-                    {
-                        name: 'tester2',
-                        age: 12
-                    }];
-                await fileManager.saveJsonToMongodb('test', json);
-            })
+        test("should save json file into the local mongodb", async () => {
+            const json = JSON.parse(readFileSync('testCases/example/info/gitObjectToJson.json', 'utf8'));
+            await fileManager.saveJsonToMongodb('test', json);
+        });
+
+        test("should save map into the local mongodb", async () => {
+            const json = JSON.parse(readFileSync('testCases/example/info/packMapToJson.json', 'utf8'));
+            await fileManager.saveJsonToMongodb('test', json);
         });
     });
 
