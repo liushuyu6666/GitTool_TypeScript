@@ -29,9 +29,9 @@ export class ObjectManager {
         this._packMap = value;
     }
 
-    constructor(looseFilePaths: string[], packedFilePath: string[]) {
+    constructor(looseFilePaths: string[], packedFilePaths: string[]) {
         this._looseFilePaths = looseFilePaths;
-        this._packedFilePaths = packedFilePath;
+        this._packedFilePaths = packedFilePaths;
         this._gitObjects = [];
         this._packMap = new Map<string, PackMapItem>();
     }
