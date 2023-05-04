@@ -100,11 +100,21 @@ export class ObjectManager {
         return this._packMap;
     }
 
-    gitObjectToJson() {
+    gitObjectToJson(): string {
         const gitObjectJson: Object[] = [];
         for (const gitObject of this.gitObjects) {
             gitObjectJson.push(gitObject.toJson());
         }
-        return gitObjectJson;
+        return JSON.stringify(gitObjectJson);
+    }
+
+    packMapToJson(): string {
+        const packMapInArray = Array
+            .from(this._packMap.entries())
+            .map(([key, {prevHash, nextHashes}]) => 
+                [key, {prevHash, nextHashes: Array.from(nextHashes)}]);
+        const plainObject = Object.fromEntries(packMapInArray);
+        const jsonString = JSON.stringify(plainObject);
+        return jsonString;
     }
 }

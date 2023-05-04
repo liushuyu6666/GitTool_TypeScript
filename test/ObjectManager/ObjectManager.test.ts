@@ -4,6 +4,27 @@ import { ObjectManager } from "../../src/ObjectManager/ObjectManager"
 describe("Test ObjectManager class", () => {
     let objectManager: ObjectManager;
 
+    describe("upon example test cases.", () => {
+
+        beforeAll(() => {
+            const looseFilePaths: string[] = JSON.parse(readFileSync('testCases/example/info/looseFilePaths.json', 'utf8'));
+            const packedFilePaths: string[] = JSON.parse(readFileSync('testCases/example/info/packedFilePaths.json', 'utf8'));
+            objectManager = new ObjectManager(looseFilePaths, packedFilePaths);
+        });
+
+        test("gitObjectToJson method should convert all git objects to .json.", () => {
+            objectManager.generateGitObjects();
+            const json = objectManager.gitObjectToJson();
+            expect(json).toBe(JSON.parse(readFileSync('testCases/example/info/gitObjectToJson.json', 'utf8')));
+        });
+
+        test("packMapToJson method should convert packMap to .json.", () => {
+            objectManager.generatePackMap();
+            const json = objectManager.packMapToJson();
+            expect(json).toBe(JSON.parse(readFileSync('testCases/example/info/packMapToJson.json', 'utf8')));
+        });
+    });
+
     describe("upon prod repository.", () => {
 
         beforeAll(() => {
@@ -21,10 +42,5 @@ describe("Test ObjectManager class", () => {
         //     objectManager.generatePackMap();
         //     expect(objectManager.packMap.size).toBe(16901);
         // });
-
-        test("gitObjectToJson method should convert all git objects to .json.", () => {
-            const json = objectManager.gitObjectToJson();
-            expect(json.length).toBe(16901);
-        })
     });
 })
