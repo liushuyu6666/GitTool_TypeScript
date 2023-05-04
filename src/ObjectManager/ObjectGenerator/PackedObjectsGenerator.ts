@@ -32,7 +32,6 @@ export interface Entry {
     bodyEndIndex: number;
 }
 
-// TODO: try to
 export class PackedObjectsGenerator {
     private _dotIdxFilePath: string;
 

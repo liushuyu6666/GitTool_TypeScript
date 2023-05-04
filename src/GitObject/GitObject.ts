@@ -42,6 +42,7 @@ export class GitObject implements GitObjectInterface {
         this._filePath = value;
     }
 
+    // For the loose object, the content need to be inflated first
     private _startIdx: number | undefined;
     public get startIdx(): number | undefined {
         return this._startIdx;
