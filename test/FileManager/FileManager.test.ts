@@ -37,6 +37,19 @@ describe("Test FileManager class", () => {
                 const path = fileManager.getPackedFilePaths();
                 const expectPath = JSON.parse(fs.readFileSync(packedFilePaths, 'utf8'));
                 expect(path).toEqual(expectPath);
+            });
+
+            test("should save json file into the local mongodb", async () => {
+                const json = [
+                    {
+                        name: 'tester1',
+                        age: 11
+                    },
+                    {
+                        name: 'tester2',
+                        age: 12
+                    }];
+                await fileManager.saveJsonToMongodb('test', json);
             })
         });
     });

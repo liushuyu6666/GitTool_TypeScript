@@ -1,8 +1,12 @@
 import exactMatchArray from "../utils/exactMatchArray";
 import { FileManagerInterface } from "./FileManagerInterface";
+import { MongoClient } from 'mongodb';
 import path from 'path';
 import fs from 'fs';
 
+// TODO: move dotenv variables to the configuration manager
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 
 export class FileManager implements FileManagerInterface {
     private _inDir: string;
@@ -70,5 +74,14 @@ export class FileManager implements FileManagerInterface {
         const set = new Set(noExtension);
       
         return Array.from(set.values());
+    }
+
+    public async saveJsonToMongodb(colName: string, json: any) {
+        const mongoUri = process.env.MONGO_URI ?? '';
+        const client = await MongoClient.connect(mongoUri);
+        const db = client.db();
+        const collection = db.collection(colName);
+        await collection.insertMany(json);
+        await client.close();
     }
 }
