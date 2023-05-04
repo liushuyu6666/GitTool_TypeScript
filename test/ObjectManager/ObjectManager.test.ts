@@ -12,9 +12,14 @@ describe("Test ObjectManager class", () => {
             objectManager = new ObjectManager(looseFilePaths, packedFilePaths);
         });
 
-        test("ObjectManager should generate all gitObjects properly", () => {
+        test("generateGitObjects method should generate all gitObjects properly.", () => {
             objectManager.generateGitObjects();
             expect(objectManager.gitObjects.length).toBe(16901);
+        });
+
+        test("generatePackMap method should generate PackMap for further process.", () => {
+            objectManager.generatePackMap();
+            expect(objectManager.packMap.size).toBe(16901);
         })
     });
 })
