@@ -1,4 +1,4 @@
-import { Fanout } from "../../../src/ObjectManager/ObjectGenerator/Fanout";
+import { Fanout } from "../../src/archive/Fanout";
 import { readFileSync } from 'fs';
 import path from 'path';
 

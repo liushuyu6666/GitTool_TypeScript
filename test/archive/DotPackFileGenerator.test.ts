@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { DotPackFileGenerator } from "../../../src/ObjectManager/ObjectGenerator/DotPackFileGenerator"
+import { DotPackFileGenerator } from "../../src/archive/DotPackFileGenerator"
 import path from 'path';
 
 // TODO: Archive this class as all logic had been moved to PackedObjectsGenerator

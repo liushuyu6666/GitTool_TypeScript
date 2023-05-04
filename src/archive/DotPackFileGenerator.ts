@@ -1,12 +1,12 @@
 import { readFileSync } from 'fs';
-import convertRecordToArray from '../../utils/convertRecordToArray';
-import { isUndeltifiedObject } from '../../utils/getGitObjectType';
+import convertRecordToArray from '../utils/convertRecordToArray';
+import { isUndeltifiedObject } from '../utils/getGitObjectType';
 import { Offset } from './Fanout';
-import { GitObjectType } from '../../Enum/GitObjectType';
-import { BufferVarint } from '../../Buffer/BufferVarint';
-import getGitObjectType from '../../utils/getGitObjectType';
-import { GitObject } from '../../GitObject/GitObject';
-import swapKeyAndValueInRecords from '../../utils/swapKeyAndValueInRecords';
+import { GitObjectType } from '../Enum/GitObjectType';
+import { BufferVarint } from '../Buffer/BufferVarint';
+import getGitObjectType from '../utils/getGitObjectType';
+import { GitObject } from '../GitObject/GitObject';
+import swapKeyAndValueInRecords from '../utils/swapKeyAndValueInRecords';
 
 // TODO: Archive this class as all logic had been moved to PackedObjectsGenerator
 

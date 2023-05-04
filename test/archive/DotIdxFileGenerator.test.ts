@@ -1,4 +1,4 @@
-import { DotIdxFileGenerator } from "../../../src/ObjectManager/ObjectGenerator/DotIdxFileGenerator";
+import { DotIdxFileGenerator } from "../../src/archive/DotIdxFileGenerator";
 import { readFileSync } from 'fs';
 import path from 'path';
 
