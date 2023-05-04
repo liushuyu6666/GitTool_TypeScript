@@ -1,11 +1,16 @@
 import { readFileSync } from 'fs';
 import convertRecordToArray from '../../utils/convertRecordToArray';
+import { isUndeltifiedObject } from '../../utils/getGitObjectType';
 import { Offset } from './Fanout';
 import { GitObjectType } from '../../Enum/GitObjectType';
 import { BufferVarint } from '../../Buffer/BufferVarint';
 import getGitObjectType from '../../utils/getGitObjectType';
+import { GitObject } from '../../GitObject/GitObject';
+import swapKeyAndValueInRecords from '../../utils/swapKeyAndValueInRecords';
 
 export interface Entry {
+    hash: string;
+
     type: GitObjectType;
 
     size: number;
@@ -24,22 +29,13 @@ export interface Entry {
 }
 
 export interface DotPackFileGeneratorInterface {
-    size: number;
+    content: Buffer;
 
-    // 'PACK'
-    layer1: string;
+    filePath: string;
 
-    // version
-    layer2: number;
+    entries: Entry[];
 
-    // object hex list
-    layer3: number;
-
-    // data chunk
-    layer4: Record<string, Entry>;
-
-    // checksum
-    layer5: Buffer;
+    offsets: Record<string, number>;
 
     // layer 1: [0, 4)
     parseLayer1(content: Buffer): string;
@@ -49,38 +45,26 @@ export interface DotPackFileGeneratorInterface {
     // layer 3: [8, 12)
     parseLayer3(content: Buffer): number;
 
-    parseLayer4(offsets: Record<string, number>, content: Buffer): Record<string, Entry>;
-
     parseLayer5(content: Buffer): Buffer;
+
+    generateGitObjects(): GitObject[];
 }
 
 // TODO: need setter and getter
 export class DotPackFileGenerator implements DotPackFileGeneratorInterface {
-    size: number;
+    content: Buffer;
 
-    // 'PACK'
-    layer1: string;
+    filePath: string;
 
-    // version
-    layer2: number;
+    entries: Entry[];
 
-    // object hex list
-    layer3: number;
-
-    // data chunk
-    layer4: Record<string, Entry>;
-
-    // checksum
-    layer5: Buffer;
+    offsets: Record<string, number>;
 
     constructor(filePath: string, offsets: Record<string, number>) {
-        const content = readFileSync(filePath);
-        this.size = content.length;
-        this.layer1 = this.parseLayer1(content);
-        this.layer2 = this.parseLayer2(content);
-        this.layer3 = this.parseLayer3(content);
-        this.layer4 = this.parseLayer4(offsets, content);
-        this.layer5 = this.parseLayer5(content);
+        this.offsets = offsets;
+        this.content = readFileSync(filePath);
+        this.filePath = filePath;
+        this.entries = this._parseLayer4();
     }
 
     // layer 1: [0, 4)
@@ -98,24 +82,24 @@ export class DotPackFileGenerator implements DotPackFileGeneratorInterface {
         return content.subarray(8, 12).readUInt32BE();
     }
 
-    parseLayer4(offsets: Record<string, number>, content: Buffer): Record<string, Entry> {
-        const offsetArray: Offset[] = convertRecordToArray(offsets, 'hex', 'offset') as Offset[];
+    private _parseLayer4(): Entry[] {
+        const offsetArray: Offset[] = convertRecordToArray(this.offsets, 'hex', 'offset') as Offset[];
 
         // sort offsetArray ascending
         // offsetArray.length = offsets.length + 1
         offsetArray.sort((prev, next) => prev.offset - next.offset);
         offsetArray.push({
             hex: '',
-            offset: content.length - 20 // this is the endIndex of the last object entry
+            offset: this.content.length - 20 // this is the endIndex of the last object entry
         })
 
-        const gitPackObjectEntry: Record<string, Entry> = {};
-        for (let i = 0; i < Object.keys(offsets).length; i++) {
+        const gitPackObjectEntry: Entry[] = [];
+        for (let i = 0; i < Object.keys(this.offsets).length; i++) {
             const startIndex = offsetArray[i].offset;
             const endIndex = offsetArray[i + 1].offset;
             const hex = offsetArray[i].hex;
-            const entry = this._getEntry(content, startIndex, endIndex);
-            gitPackObjectEntry[hex] = {...entry, offsetIndex: startIndex};
+            const entry = this._getEntry(this.content, startIndex, endIndex);
+            gitPackObjectEntry.push({...entry, offsetIndex: startIndex, hash: hex});
         }
         return gitPackObjectEntry;
     }
@@ -124,7 +108,17 @@ export class DotPackFileGenerator implements DotPackFileGeneratorInterface {
         return content.subarray(content.length - 20);
     }
 
-    private _getEntry(content: Buffer, startIndex: number, endIndex: number): Omit<Entry, "offsetIndex"> {
+    generateGitObjects(): GitObject[] {
+        const swapOffsets: Record<number, string> = swapKeyAndValueInRecords(this.offsets);
+        const gitObjects: GitObject[] = [];
+        for(const entry of this.entries) {
+            const gitObject = this._parseEntryToGitObject(this.content, entry, this.filePath, swapOffsets);
+            gitObjects.push(gitObject);
+        }
+        return gitObjects;
+    }
+
+    private _getEntry(content: Buffer, startIndex: number, endIndex: number): Omit<Entry, "offsetIndex" | "hash"> {
         const chunk = content.subarray(startIndex, endIndex);
         const bv = new BufferVarint();
         const [[size, bodyStartIndex], typeNumber] = bv.getFirstVarintWithType(chunk);
@@ -134,5 +128,47 @@ export class DotPackFileGenerator implements DotPackFileGeneratorInterface {
             bodyStartIndex: startIndex + bodyStartIndex,
             bodyEndIndex: endIndex,
         };
+    }
+
+    private _parseEntryToGitObject(content: Buffer, entry: Entry, filePath: string, swapOffsets: Record<number, string>): GitObject {
+        if(isUndeltifiedObject(entry.type)) {
+            return new GitObject(
+                entry.hash, 
+                entry.type, 
+                entry.size, 
+                undefined, 
+                filePath, 
+                entry.bodyStartIndex, 
+                entry.bodyEndIndex);
+        }
+        if(entry.type === GitObjectType.REF_DELTA) {
+            const bodyStartIndex = entry.bodyStartIndex;
+            const baseHash =  content.subarray(bodyStartIndex, bodyStartIndex + 20).toString('hex');
+            return new GitObject(
+                entry.hash,
+                GitObjectType.REF_DELTA,
+                entry.size,
+                baseHash,
+                filePath,
+                bodyStartIndex + 20,
+                entry.bodyEndIndex
+            );
+        }
+        if(entry.type === GitObjectType.OFS_DELTA) {
+            const bv = new BufferVarint()
+            const [negative, startIdx] = bv.getFirstVarintWithoutType(content.subarray(entry.bodyStartIndex));
+            const baseHashOffset = entry.offsetIndex - negative;
+            const baseHash = swapOffsets[baseHashOffset];
+            return new GitObject(
+                entry.hash,
+                GitObjectType.OFS_DELTA,
+                entry.size,
+                baseHash,
+                filePath,
+                entry.bodyStartIndex + startIdx,
+                entry.bodyEndIndex
+            );
+        }
+        throw new Error(`The entry hash ${entry.hash} has illegal type ${entry.type} in _parseEntryToGitObject.`)
     }
 }

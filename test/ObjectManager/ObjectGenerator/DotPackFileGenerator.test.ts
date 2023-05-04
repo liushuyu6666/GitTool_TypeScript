@@ -24,16 +24,8 @@ describe("Test DotPackFileGenerator class", () => {
             dotPackFileGenerator = new DotPackFileGenerator(`${filePath}.pack`, offsets);
         });
 
-        test("Layer 1 should be PACK", () => {
-            expect(dotPackFileGenerator.layer1).toBe('PACK');
-        });
-
-        test("Layer 2 should be 2", () => {
-            expect(dotPackFileGenerator.layer2).toBe(2);
-        });
-
-        test("Layer 4 should be deciphered correctly", () => {
-            expect(dotPackFileGenerator.layer4).toEqual(entry);
+        test("entries should be deciphered correctly", () => {
+            expect(dotPackFileGenerator.entries).toEqual(entry);
         })
     });
 
@@ -46,16 +38,31 @@ describe("Test DotPackFileGenerator class", () => {
             dotPackFileGenerator = new DotPackFileGenerator(`${filePath}.pack`, offsets);
         });
 
-        test("Layer 1 should be PACK", () => {
-            expect(dotPackFileGenerator.layer1).toBe('PACK');
+        test("entries should be deciphered correctly", () => {
+            expect(dotPackFileGenerator.entries).toEqual(entry);
         });
+    });
+});
 
-        test("Layer 2 should be 2", () => {
-            expect(dotPackFileGenerator.layer2).toBe(2);
-        });
+describe("Test DotPackFileGenerator class upon the product repository,", () => {
+    let dotPackFileGenerator: DotPackFileGenerator;
 
-        test("Layer 4 should be deciphered correctly", () => {
-            expect(dotPackFileGenerator.layer4).toEqual(entry);
-        });
+    beforeEach(() => {
+        const offsetFilePath = 'testCases/prodExample/info/offset.json';
+        const offsets = JSON.parse(readFileSync(offsetFilePath, 'utf8'));
+        const filePath = 'testCases/prodExample/git/objects/pack/pack-6525f361652375f49c5cbd639d3f18d9dc780dcc.pack';
+        dotPackFileGenerator = new DotPackFileGenerator(filePath, offsets);
+    });
+
+    test("the parseLayer4 method should return an Entry array", () => {
+        const entries = dotPackFileGenerator.entries;
+        const expectEntries = JSON.parse(readFileSync('testCases/prodExample/info/entries.json', 'utf8'));
+        expect(entries).toEqual(expectEntries);
+    });
+
+    test("the generateGitObjects method should return an GitObject array", () => {
+        const gitObjects = dotPackFileGenerator.generateGitObjects();
+        const expectGitObjects = JSON.parse(readFileSync('testCases/prodExample/info/gitObjects.json', 'utf8'));
+        expect(gitObjects).toEqual(expectGitObjects);
     })
-})
+});

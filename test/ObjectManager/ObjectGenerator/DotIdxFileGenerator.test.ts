@@ -54,4 +54,18 @@ describe("Test DotIdxFileGenerator class:", () => {
             expect(dotIdxFileGenerator.header).toEqual([255, 116, 79, 99]);
         });
     });
+});
+
+describe("Test DotIdxFileGenerator class upon the product repository,", () => {
+    let dotIdxFileGenerator: DotIdxFileGenerator;
+
+    beforeEach(() => {
+        const filePath = 'testCases/prodExample/git/objects/pack/pack-6525f361652375f49c5cbd639d3f18d9dc780dcc.idx';
+        dotIdxFileGenerator = new DotIdxFileGenerator(filePath);
+    })
+
+    test("The offset should be generated properly.", () => {
+        const offsets = dotIdxFileGenerator.fanout.offsets;
+        expect(Object.keys(offsets).length).toBe(118);
+    })
 })
