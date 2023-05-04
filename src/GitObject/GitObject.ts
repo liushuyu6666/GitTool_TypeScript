@@ -1,7 +1,6 @@
 import { GitObjectType } from "../Enum/GitObjectType";
-import { GitObjectInterface } from "./GitObjectInterface";
 
-export class GitObject implements GitObjectInterface {
+export class GitObject {
     private _hash: string;
     public get hash(): string {
         return this._hash;
