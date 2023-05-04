@@ -15,13 +15,13 @@ describe("Test ObjectManager class", () => {
         test("gitObjectToJson method should convert all git objects to .json.", () => {
             objectManager.generateGitObjects();
             const json = objectManager.gitObjectToJson();
-            expect(json).toBe(JSON.parse(readFileSync('testCases/example/info/gitObjectToJson.json', 'utf8')));
+            expect(json).toEqual(JSON.parse(readFileSync('testCases/example/info/gitObjectToJson.json', 'utf8')));
         });
 
         test("packMapToJson method should convert packMap to .json.", () => {
             objectManager.generatePackMap();
             const json = objectManager.packMapToJson();
-            expect(json).toBe(JSON.parse(readFileSync('testCases/example/info/packMapToJson.json', 'utf8')));
+            expect(json).toEqual(JSON.parse(readFileSync('testCases/example/info/packMapToJson.json', 'utf8')));
         });
     });
 

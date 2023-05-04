@@ -88,6 +88,6 @@ export class GitObject {
             const keyWithoutUnderscore = key.replace('_', ''); // remove the underscore
             json[keyWithoutUnderscore] = (this as any)[key];
         }
-        return JSON.stringify(json);
+        return json;
     }
 }
