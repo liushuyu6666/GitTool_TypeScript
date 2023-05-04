@@ -2,6 +2,9 @@ export interface Offset {
     hex: string;
     offset: number;
 }
+
+// TODO: Archive this class as all logic had been moved to PackedObjectsGenerator
+
   
 export interface FanoutInterface {
     entrySize: number;

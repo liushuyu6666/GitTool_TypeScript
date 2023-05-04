@@ -1,0 +1,26 @@
+[
+  {
+    "_hash": "c17358365df785db682260407606051b011eee88",
+    "_gitObjectType": "commit_delta",
+    "_size": 1163,
+    "_filePath": "testCases/example/git/objects/pack/pack-5fec731b51ec842da6351423114d4bbee41e7aee.pack",
+    "_startIdx": 14,
+    "_endIdx": 138
+  },
+  {
+    "_hash": "3b18e512dba79e4c8300dd08aeb37f8e728b8dad",
+    "_gitObjectType": "blob_delta",
+    "_size": 12,
+    "_filePath": "testCases/example/git/objects/pack/pack-5fec731b51ec842da6351423114d4bbee41e7aee.pack",
+    "_startIdx": 139,
+    "_endIdx": 159
+  },
+  {
+    "_hash": "c3b8bb102afeca86037d5b5dd89ceeb0090eae9d",
+    "_gitObjectType": "tree_delta",
+    "_size": 514,
+    "_filePath": "testCases/example/git/objects/pack/pack-5fec731b51ec842da6351423114d4bbee41e7aee.pack",
+    "_startIdx": 161,
+    "_endIdx": 206
+  }
+]

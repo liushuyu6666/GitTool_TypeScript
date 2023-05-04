@@ -8,6 +8,8 @@ import getGitObjectType from '../../utils/getGitObjectType';
 import { GitObject } from '../../GitObject/GitObject';
 import swapKeyAndValueInRecords from '../../utils/swapKeyAndValueInRecords';
 
+// TODO: Archive this class as all logic had been moved to PackedObjectsGenerator
+
 export interface Entry {
     hash: string;
 

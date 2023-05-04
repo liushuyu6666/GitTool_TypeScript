@@ -2,6 +2,9 @@ import { Fanout } from "../../../src/ObjectManager/ObjectGenerator/Fanout";
 import { readFileSync } from 'fs';
 import path from 'path';
 
+// TODO: Archive this class as all logic had been moved to PackedObjectsGenerator
+// TODO: re-organize testCases/example/info/ to keep these intermediate variables.
+
 describe("Test the offset in the Fanout class:", () => {
     let fanout: Fanout;
     

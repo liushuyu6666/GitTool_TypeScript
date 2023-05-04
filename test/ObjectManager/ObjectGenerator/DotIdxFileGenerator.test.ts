@@ -2,6 +2,10 @@ import { DotIdxFileGenerator } from "../../../src/ObjectManager/ObjectGenerator/
 import { readFileSync } from 'fs';
 import path from 'path';
 
+// TODO: Archive this class as all logic had been moved to PackedObjectsGenerator
+// TODO: re-organize testCases/example/info/ to keep these intermediate variables.
+
+
 describe("Test DotIdxFileGenerator class:", () => {
     let dotIdxFileGenerator: DotIdxFileGenerator;
 

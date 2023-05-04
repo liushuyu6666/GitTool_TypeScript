@@ -1,6 +1,7 @@
 import { Fanout } from "./Fanout";
 import { readFileSync } from 'fs';
 
+// TODO: Archive this class as all logic had been moved to PackedObjectsGenerator
 export interface DotIdxFileGeneratorInterface {
     byteSize: number;
     

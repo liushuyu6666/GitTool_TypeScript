@@ -2,6 +2,9 @@ import { readFileSync } from "fs";
 import { DotPackFileGenerator } from "../../../src/ObjectManager/ObjectGenerator/DotPackFileGenerator"
 import path from 'path';
 
+// TODO: Archive this class as all logic had been moved to PackedObjectsGenerator
+// TODO: re-organize testCases/example/info/ to keep these intermediate variables.
+
 describe("Test DotPackFileGenerator class", () => {
     let dotPackFileGenerator: DotPackFileGenerator;
 
