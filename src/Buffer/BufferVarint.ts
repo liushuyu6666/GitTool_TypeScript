@@ -1,3 +1,4 @@
+import getMarginValue from "../utils/getMarginValue";
 import { BufferManipulation } from "./BufferManipulation";
 
 export class BufferVarint {
@@ -28,6 +29,9 @@ export class BufferVarint {
     }
 
     public getFirstVarintWithoutType(buffer: Buffer): [number, number] {
-        return this._concatenate(buffer, 1);
+        const [negativeBeforeMarginValue, startIndex] = this._concatenate(buffer, 1);
+        const marginValue = getMarginValue(startIndex);
+        const negative = negativeBeforeMarginValue + marginValue;
+        return [negative, startIndex];
     }
 }
