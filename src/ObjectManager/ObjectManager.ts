@@ -1,5 +1,4 @@
 import { GitObject } from "../GitObject/GitObject";
-import logMemoryUsage from "../utils/logMemoryUsage";
 import { LooseObjectGenerator } from "./ObjectGenerator/LooseObjectGenerator";
 import { PackedObjectsGenerator } from "./ObjectGenerator/PackedObjectsGenerator";
 
