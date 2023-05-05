@@ -73,7 +73,7 @@ export class ObjectManager {
             if(prevHash && !this._packMap.has(prevHash)) {
                 this._packMap.set(prevHash, {
                     prevHash: '',
-                    nextHashes: new Set<string>(currHash)
+                    nextHashes: new Set<string>([currHash])
                 });
                 j++;
             } else if(prevHash && this._packMap.has(prevHash)) {
