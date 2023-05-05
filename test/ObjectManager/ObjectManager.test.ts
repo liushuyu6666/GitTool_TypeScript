@@ -38,9 +38,11 @@ describe("Test ObjectManager class", () => {
             expect(objectManager.gitObjects.length).toBe(16901);
         });
 
-        // test("generatePackMap method should generate PackMap for further process.", () => {
-        //     objectManager.generatePackMap();
-        //     expect(objectManager.packMap.size).toBe(16901);
-        // });
+        // objectManager.gitObjects.length != objectManager.packMap.size
+        // because there are some duplicated entries in the gitObjects.
+        test("generatePackMap method should generate PackMap for further process.", () => {
+            objectManager.generatePackMap();
+            expect(objectManager.packMap.size).toBe(16287);
+        });
     });
 })
