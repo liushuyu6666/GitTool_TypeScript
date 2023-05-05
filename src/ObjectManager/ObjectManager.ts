@@ -35,6 +35,7 @@ export class ObjectManager {
         this._packMap = new Map<string, PackMapItem>();
     }
 
+    // There are some duplicated entries in the gitObjects.
     generateGitObjects(): GitObject[] {
         let packedSum = 0;
         for(const looseFilePath of this._looseFilePaths) {
