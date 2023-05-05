@@ -111,12 +111,13 @@ export class ObjectManager {
     packMapToJson(): Object[] {
         const json: Object[] = [];
         for(const [key, {prevHash, nextHashes}] of this._packMap.entries()) {
-            json.push({
-                [key]: {
+            json.push(
+                {
+                    hash: key,
                     prevHash,
                     nextHashes: Array.from(nextHashes)
                 }
-            });
+            );
         }
         return json;
     }
