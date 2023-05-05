@@ -163,6 +163,12 @@ export class PackedObjectsGenerator {
             const [negative, startIdx] = bv.getFirstVarintWithoutType(content.subarray(entry.bodyStartIndex));
             const baseHashOffset = entry.offsetIndex - negative;
             const baseHash = swapOffsets[baseHashOffset];
+            
+            // OFS_DELTA object must have a baseHash
+            if(!baseHash || baseHash === undefined || baseHash === null || baseHash.length === 0) {
+                throw new Error(`OFS DELTA ${entry.hash} has no baseHash!`);
+            }
+
             return new GitObject(
                 entry.hash,
                 GitObjectType.OFS_DELTA,
