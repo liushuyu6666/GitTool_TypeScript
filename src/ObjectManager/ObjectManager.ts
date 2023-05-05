@@ -56,12 +56,11 @@ export class ObjectManager {
             ${this._looseFilePaths.length + packedSum} git objects are generated in total.
         `);
 
-        logMemoryUsage();
+        // logMemoryUsage();
         return this.gitObjects;
     }
 
     generatePackMap(): Map<string, PackMapItem> {
-        let i = 0, j = 0;
         if(this.gitObjects.length === 0) {
             this.generateGitObjects();
         }
@@ -75,10 +74,8 @@ export class ObjectManager {
                     prevHash: '',
                     nextHashes: new Set<string>([currHash])
                 });
-                j++;
             } else if(prevHash && this._packMap.has(prevHash)) {
                 this._packMap.get(prevHash)!.nextHashes.add(currHash);
-                j++;
             }
 
             // update prevHash
@@ -87,16 +84,12 @@ export class ObjectManager {
                     prevHash: prevHash,
                     nextHashes: new Set<string>()
                 });
-                i++;
             } else {
                 this._packMap.get(currHash)!.prevHash = prevHash;
-                i++;
             }
         }
-
-        console.log(`update prevHash ${i} times and update nextHashes ${j} times`);
-
-        logMemoryUsage();
+        console.log(`${this._packMap.size} packMap are generated.`);
+        // logMemoryUsage();
         return this._packMap;
     }
 
