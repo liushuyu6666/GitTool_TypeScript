@@ -29,5 +29,6 @@ describe('Test blobParser function', () => {
         const data = blobParser(decryptedBuf);
         
         expect(data.substring(0, 26)).toBe(`import 'isomorphic-fetch';`);
+        expect(data.length).toBe(1392);
     });
 });
