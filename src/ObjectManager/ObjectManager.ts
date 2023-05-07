@@ -1,4 +1,6 @@
+import { Entrance } from "../Entrance/Entrance";
 import { GitObject } from "../GitObject/GitObject";
+import { isLooseObject } from "../utils/getGitObjectType";
 import { LooseObjectGenerator } from "./ObjectGenerator/LooseObjectGenerator";
 import { PackedObjectsGenerator } from "./ObjectGenerator/PackedObjectsGenerator";
 
@@ -13,6 +15,8 @@ export class ObjectManager {
     private _packedFilePaths: string[];
 
     private _gitObjects: GitObject[];
+
+    public entrance: Entrance;
     public get gitObjects(): GitObject[] {
         return this._gitObjects;
     }
@@ -33,6 +37,7 @@ export class ObjectManager {
         this._packedFilePaths = packedFilePaths;
         this._gitObjects = [];
         this._packMap = new Map<string, PackMapItem>();
+        this.entrance = new Entrance();
     }
 
     // There are some duplicated entries in the gitObjects.
@@ -50,10 +55,7 @@ export class ObjectManager {
             packedSum += packedObjects.length;
         }
 
-        console.log(`
-            ${this._looseFilePaths.length} loose git objects are generated.
-            ${packedSum} packed git objects are generated.
-            ${this._looseFilePaths.length + packedSum} git objects are generated in total.
+        console.log(`${this._looseFilePaths.length} loose git objects are generated.\n${packedSum} packed git objects are generated.\n${this._looseFilePaths.length + packedSum} git objects are generated in total.
         `);
 
         // logMemoryUsage();
@@ -91,6 +93,18 @@ export class ObjectManager {
         console.log(`${this._packMap.size} packMap are generated.`);
         // logMemoryUsage();
         return this._packMap;
+    }
+
+    generateEntrance(): Entrance {
+        if(this.gitObjects && this.gitObjects.length === 0) {
+            this.generateGitObjects();
+        }
+        for(const gitObject of this.gitObjects) {
+            if(!isLooseObject(gitObject.gitObjectType!)){
+                this.entrance.insertGitObject(gitObject);}
+        }
+        console.log(`entrance is generated.`);
+        return this.entrance;
     }
 
     gitObjectToJson(): Object[] {

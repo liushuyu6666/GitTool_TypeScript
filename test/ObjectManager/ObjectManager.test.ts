@@ -44,5 +44,10 @@ describe("Test ObjectManager class", () => {
             objectManager.generatePackMap();
             expect(objectManager.packMap.size).toBe(16287);
         });
+
+        test("generateEntrance method should generate a entrance with 16 entranceFiles", () => {
+            objectManager.generateEntrance();
+            expect(objectManager.entrance.entranceFiles.length).toBe(16);
+        })
     });
 })
