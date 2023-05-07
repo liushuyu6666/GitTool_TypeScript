@@ -66,16 +66,16 @@ describe("Test GitObject class", () => {
         });
 
         test("toJson should return correct json string.", () => {
-            const expectJson = JSON.stringify({
-                hash: hash,
-                gitObjectType: gitObjectType,
-                size: size,
+            const expectJson = {
                 baseHash: baseHash,
+                endIdx: endIdx,
                 filePath: filePath,
+                gitObjectType: gitObjectType,
+                hash: hash,
+                size: size,
                 startIdx: startIdx,
-                endIdx: endIdx
-            });
-            expect(gitObject.toJson()).toBe(expectJson);
+            };
+            expect(gitObject.toJson()).toEqual(expectJson);
         })
     })
 
