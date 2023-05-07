@@ -160,7 +160,7 @@ export class PackedObjectsGenerator {
         }
         if(entry.type === GitObjectType.OFS_DELTA) {
             const bv = new BufferVarint()
-            const [negative, startIdx] = bv.getFirstVarintWithoutType(content.subarray(entry.bodyStartIndex));
+            const [negative, startIdx] = bv.getOffsetEncoding(content.subarray(entry.bodyStartIndex));
             const baseHashOffset = entry.offsetIndex - negative;
             const baseHash = swapOffsets[baseHashOffset];
             

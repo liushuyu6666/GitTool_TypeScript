@@ -8,6 +8,14 @@ describe("Test BufferVarint class", () => {
             bufferVarint = new BufferVarint();
         });
 
+        test("The getOffset function should return the right value.", () => {
+            expect(bufferVarint.getOffset(1)).toBe(0);
+            expect(bufferVarint.getOffset(2)).toBe(128);
+            expect(bufferVarint.getOffset(3)).toBe(16512);
+            expect(bufferVarint.getOffset(4)).toBe(2113664);
+            expect(bufferVarint.getOffset(5)).toBe(270549120);
+        })
+
         test("The getFirstVarintWithType function should return the right type and a 4-bit variable-length integer with the end index for a 1-byte buffer.", () => {
             const buf = Buffer.from([0b00111101]); // type: 011; data: 1101
             const [[size, idx], type] = bufferVarint.getFirstVarintWithType(buf);
