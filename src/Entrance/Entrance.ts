@@ -41,13 +41,17 @@ export class EntranceFile {
 
 export class Entrance {
     // Due to the possibility of duplicated hashes, filePath is necessary.
-    // Map<filePath, node>;
+    // Map<hash, node>;
     private _mapToEntranceNode: Map<string, EntranceNode>;
+
+    // Map<filePath, entranceFile>;
+    private _mapToEntranceFile: Map<string, EntranceFile>;
 
     public entranceFiles: EntranceFile[]; 
 
     constructor() {
         this._mapToEntranceNode = new Map<string, EntranceNode>();
+        this._mapToEntranceFile = new Map<string, EntranceFile>();
         this.entranceFiles = [];
     }
 
@@ -95,8 +99,14 @@ export class Entrance {
     }
 
     private _createEntranceFile(filePath: string, curr: EntranceNode): void {
-        const entranceFile = new EntranceFile(filePath);
-        entranceFile.nextNodes.push(curr);
-        this.entranceFiles.push(entranceFile);
+        if(this._mapToEntranceFile.has(filePath)) {
+            const entranceFile = this._mapToEntranceFile.get(filePath)!;
+            entranceFile.nextNodes.push(curr);
+        } else {
+            const entranceFile = new EntranceFile(filePath);
+            entranceFile.nextNodes.push(curr);
+            this.entranceFiles.push(entranceFile);
+            this._mapToEntranceFile.set(filePath, entranceFile);
+        }
     }
 }

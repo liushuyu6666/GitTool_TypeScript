@@ -75,6 +75,15 @@ const fakeGitObject8 = new GitObject(
     3,
     5
 );
+const fakeGitObject9 = new GitObject(
+    'object9',
+    GitObjectType.BLOB_DELTA,
+    12,
+    undefined,
+    'file2',
+    3,
+    5
+);
 
 describe("Test the Entrance class", () => {
     let entrance: Entrance;
@@ -116,9 +125,9 @@ describe("Test the Entrance class", () => {
     });
 
     /**
-     *    file1 ---+--- file3   file2
-     *             |              |
-     *          object1        object4
+     *    file1 ---+--- file3     +---file2---+
+     *             |              |           |
+     *          object1        object4     object9
      *             |              |
      *        +----+----+      object5
      *        |         |         |
@@ -132,11 +141,13 @@ describe("Test the Entrance class", () => {
         entrance.insertGitObject(fakeGitObject4);
         entrance.insertGitObject(fakeGitObject5);
         entrance.insertGitObject(fakeGitObject6);
+        entrance.insertGitObject(fakeGitObject9);
 
         expect(entrance.entranceFiles.length).toBe(3);
         expect(entrance.entranceFiles[0].filePath).toBe('file1');
         expect(entrance.entranceFiles[1].filePath).toBe('file3');
         expect(entrance.entranceFiles[2].filePath).toBe('file2');
+        expect(entrance.entranceFiles.length).toBe(3);
         expect(entrance.entranceFiles[0].nextNodes[0].hash).toBe('object1');
         expect(entrance.entranceFiles[2].nextNodes[0].hash).toBe('object4');
         expect(entrance.entranceFiles[0].nextNodes[0].nextNodes[0].hash).toBe('object8');
