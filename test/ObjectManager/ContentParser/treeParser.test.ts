@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { inflateSync } from 'zlib';
-import treeParser from '../../../src/ObjectManager/ContentParser.ts/treeParser';
+import treeParser from '../../../src/ObjectManager/ContentParser/treeParser';
 
 describe('Test treeParser function', () => {
     test('for parsing the loose tree object properly.', () => {

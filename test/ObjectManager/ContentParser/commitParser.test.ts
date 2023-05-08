@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { inflateSync } from 'zlib';
-import commitParser from '../../../src/ObjectManager/ContentParser.ts/commitParser';
+import commitParser from '../../../src/ObjectManager/ContentParser/commitParser';
 
 describe('Test commitParser function', () => {
     test('for parsing the loose commit object properly.', () => {

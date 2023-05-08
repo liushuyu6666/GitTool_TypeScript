@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { inflateSync } from 'zlib';
-import blobParser from '../../../src/ObjectManager/ContentParser.ts/blobParser';
+import blobParser from '../../../src/ObjectManager/ContentParser/blobParser';
 
 describe('Test blobParser function', () => {
     test('for parsing the loose blob object properly.', () => {
