@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { inflateSync } from "zlib";
-import deltifiedParser from "../../../src/ObjectManager/ContentParser.ts/deltifiedParser";
+import deltifiedParser from "../../../src/ObjectManager/ContentParser/deltifiedParser";
 
 describe('Test blobParser function,', () => {
     let baseContent: string;
