@@ -30,7 +30,8 @@ describe("Test ObjectManager class", () => {
         beforeAll(() => {
             const looseFilePaths: string[] = JSON.parse(readFileSync('testCases/prodExample/info/looseFilePaths.json', 'utf8'));
             const packedFilePaths: string[] = JSON.parse(readFileSync('testCases/prodExample/info/packedFilePaths.json', 'utf8'));
-            objectManager = new ObjectManager(looseFilePaths, packedFilePaths);
+            const outObjectDir: string = 'outDir/objects';
+            objectManager = new ObjectManager(looseFilePaths, packedFilePaths, outObjectDir);
         });
 
         test("generateGitObjects method should generate all gitObjects properly.", () => {
@@ -48,6 +49,10 @@ describe("Test ObjectManager class", () => {
         test("generateEntrance method should generate a entrance with 16 entranceFiles", () => {
             objectManager.generateEntrance();
             expect(objectManager.entrance.entranceFiles.length).toBe(16);
+        });
+
+        test("parseContent method should parse all objects properly and store them in the right folder.", () => {
+            objectManager.parseContent();
         })
     });
 })

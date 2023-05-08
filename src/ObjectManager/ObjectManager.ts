@@ -3,6 +3,7 @@ import { GitObject } from "../GitObject/GitObject";
 import { isLooseObject } from "../utils/getGitObjectType";
 import { LooseObjectGenerator } from "./ObjectGenerator/LooseObjectGenerator";
 import { PackedObjectsGenerator } from "./ObjectGenerator/PackedObjectsGenerator";
+import { LooseObjectParser } from "./ContentParser/contentParse";
 
 export interface PackMapItem {
     prevHash: string;
@@ -13,6 +14,8 @@ export class ObjectManager {
     private _looseFilePaths: string[];
 
     private _packedFilePaths: string[];
+
+    private _outObjectDir: string | undefined;
 
     private _gitObjects: GitObject[];
 
@@ -32,12 +35,13 @@ export class ObjectManager {
         this._packMap = value;
     }
 
-    constructor(looseFilePaths: string[], packedFilePaths: string[]) {
+    constructor(looseFilePaths: string[], packedFilePaths: string[], outObjectDir?: string) {
         this._looseFilePaths = looseFilePaths;
         this._packedFilePaths = packedFilePaths;
         this._gitObjects = [];
         this._packMap = new Map<string, PackMapItem>();
         this.entrance = new Entrance();
+        this._outObjectDir = outObjectDir;
     }
 
     // There are some duplicated entries in the gitObjects.
@@ -63,7 +67,7 @@ export class ObjectManager {
     }
 
     generatePackMap(): Map<string, PackMapItem> {
-        if(this.gitObjects.length === 0) {
+        if(this.gitObjects && this.gitObjects.length === 0) {
             this.generateGitObjects();
         }
         for(const gitObject of this.gitObjects) {
@@ -105,6 +109,19 @@ export class ObjectManager {
         }
         console.log(`entrance is generated.`);
         return this.entrance;
+    }
+
+    parseContent() {
+        if(!this._outObjectDir) {
+            console.error('outObjectDir is not specified!');
+            return;
+        }
+        if(this.gitObjects && this.gitObjects.length === 0) {
+            this.generateGitObjects();
+        }
+        for(const gitObject of this._gitObjects) {
+            LooseObjectParser(gitObject, this._outObjectDir);
+        }
     }
 
     gitObjectToJson(): Object[] {
