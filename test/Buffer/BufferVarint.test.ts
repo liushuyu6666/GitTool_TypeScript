@@ -38,5 +38,50 @@ describe("Test BufferVarint class", () => {
             expect(idx).toEqual(4);
             expect(type).toEqual(3);
         });
+    });
+
+    describe("In the LE mode:", () => {
+        beforeEach(() => {
+            bufferVarint = new BufferVarint(false);
+        });
+
+        test("The getCopyInstruction function should work when the header is 0b11111111", () => {
+            const copyInstruction = Buffer.from([
+                0b11111111, 
+                0b11001101,
+                0b00100110,
+                0b10101010,
+                0b00111111,
+                0b00000100,
+                0b01000000,
+                0b00100111
+            ]);
+            const [offset, size] = bufferVarint.getCopyInstruction(copyInstruction);
+            expect(offset).toBe(1068115661);
+            expect(size).toBe(2572292);
+        });
+
+        test("The getCopyInstruction function should work when the header is 0b10101001", () => {
+            const copyInstruction = Buffer.from([
+                0b10101001, 
+                0b11001101,
+                0b10101010,
+                0b00111111
+            ]);
+            // header = 0b1 010 (size) 1001 (offset)
+            const [offset, size] = bufferVarint.getCopyInstruction(copyInstruction);
+            expect(offset).toBe(2852126925);
+            expect(size).toBe(16128);
+        });
+
+        test("The getCopyInstruction function should work when the header is 0b00000000", () => {
+            const copyInstruction = Buffer.from([
+                0b10000000
+            ]);
+            // header = 0b1 010 (size) 1001 (offset)
+            const [offset, size] = bufferVarint.getCopyInstruction(copyInstruction);
+            expect(offset).toBe(0);
+            expect(size).toBe(0x10000);
+        });
     })
 })
