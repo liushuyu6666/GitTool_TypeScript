@@ -52,7 +52,7 @@ export class BufferVarint {
         return [negative, startIndex];
     }
 
-    public getCopyInstruction(buffer: Buffer): [number, number] {
+    public getCopyInstruction(buffer: Buffer): [number, number, number] {
         let header = buffer[0];
         let pointer = 1;
         for (let i = 0; i < 4; i++) {
@@ -86,6 +86,6 @@ export class BufferVarint {
                 ? this._bufferManipulation.stock.readUint32BE()
                 : 0x10000;
 
-        return [offset, size];
+        return [offset, size, pointer];
     }
 }

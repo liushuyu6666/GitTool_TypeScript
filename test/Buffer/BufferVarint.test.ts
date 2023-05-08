@@ -56,9 +56,10 @@ describe("Test BufferVarint class", () => {
                 0b01000000,
                 0b00100111
             ]);
-            const [offset, size] = bufferVarint.getCopyInstruction(copyInstruction);
+            const [offset, size, endIdx] = bufferVarint.getCopyInstruction(copyInstruction);
             expect(offset).toBe(1068115661);
             expect(size).toBe(2572292);
+            expect(endIdx).toBe(8);
         });
 
         test("The getCopyInstruction function should work when the header is 0b10101001", () => {
@@ -69,9 +70,10 @@ describe("Test BufferVarint class", () => {
                 0b00111111
             ]);
             // header = 0b1 010 (size) 1001 (offset)
-            const [offset, size] = bufferVarint.getCopyInstruction(copyInstruction);
+            const [offset, size, endIdx] = bufferVarint.getCopyInstruction(copyInstruction);
             expect(offset).toBe(2852126925);
             expect(size).toBe(16128);
+            expect(endIdx).toBe(4);
         });
 
         test("The getCopyInstruction function should work when the header is 0b00000000", () => {
@@ -79,9 +81,10 @@ describe("Test BufferVarint class", () => {
                 0b10000000
             ]);
             // header = 0b1 010 (size) 1001 (offset)
-            const [offset, size] = bufferVarint.getCopyInstruction(copyInstruction);
+            const [offset, size, endIdx] = bufferVarint.getCopyInstruction(copyInstruction);
             expect(offset).toBe(0);
             expect(size).toBe(0x10000);
+            expect(endIdx).toBe(1);
         });
     })
 })
