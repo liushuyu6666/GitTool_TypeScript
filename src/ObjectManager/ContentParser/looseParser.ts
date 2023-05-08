@@ -1,5 +1,4 @@
 import { readFileSync } from "fs";
-import { GitObject } from "../../GitObject/GitObject";
 import { isLooseObject } from "../../utils/getGitObjectType";
 import { inflateSync } from "zlib";
 import treeParser, { GitTreeObjectFileEntry } from "./treeParser";
@@ -7,14 +6,14 @@ import commitParser, { CommitObjectInfo } from "./commitParser";
 import { GitObjectType } from "../../Enum/GitObjectType";
 import blobParser from "./blobParser";
 
-export function looseObjectParser(gitObject: GitObject): string | GitTreeObjectFileEntry[] | CommitObjectInfo | undefined {
-    if (!isLooseObject(gitObject.gitObjectType!)) return;
+export default function (filePath: string, startIdx: number, endIdx: number, type: GitObjectType): string | GitTreeObjectFileEntry[] | CommitObjectInfo | undefined {
+    if (!isLooseObject(type)) return;
 
-    const content = readFileSync(gitObject.filePath!);
+    const content = readFileSync(filePath);
     const decryptedBuf = inflateSync(content);
-    const body = decryptedBuf.subarray(gitObject.startIdx, gitObject.endIdx);
+    const body = decryptedBuf.subarray(startIdx, endIdx);
 
-    switch (gitObject.gitObjectType) {
+    switch (type) {
         case GitObjectType.BLOB: {
             return blobParser(body);
         }
