@@ -4,7 +4,7 @@ import { BufferVarint } from "../../Buffer/BufferVarint";
  * 
  * @param body The compressed delta data
  */
-export default function(body: Buffer, baseContent: string): [number, number, string] {
+export default function(body: Buffer, baseBuffer: Buffer): [number, number, Buffer] {
     // Get the size of the base object.
     const bv1 = new BufferVarint(false);
     const [baseObjectSize, endIdx1] = bv1.getSizeEncoding(body, 1);
@@ -17,7 +17,9 @@ export default function(body: Buffer, baseContent: string): [number, number, str
     // Get the instructions
     let startIdx = endIdx1 + endIdx2;
     let instructions = body.subarray(startIdx);
-    let finalContent = '';
+    console.log(instructions.toString('hex'));
+
+    let finalBuffer = Buffer.from([]);
     while(instructions.length > 0) {
         let flag = instructions[0] & 0b10000000;
         const bv = new BufferVarint(false);
@@ -26,16 +28,16 @@ export default function(body: Buffer, baseContent: string): [number, number, str
             const [offset, size, endIdx] = bv.getCopyInstruction(instructions);
             startIdx += endIdx;
             // TODO: The offset and size parameters should be applied to bytes instead according to the official documentation.
-            finalContent += baseContent.substring(offset, offset + size);
+            finalBuffer = Buffer.concat([finalBuffer, baseBuffer.subarray(offset, offset + size)]) ;
             instructions = body.subarray(startIdx);
         } else {
             // add
             const [newSnippet, endIdx] = bv.getAddInstruction(instructions);
             startIdx += endIdx;
-            finalContent += newSnippet;
+            finalBuffer = Buffer.concat([finalBuffer, newSnippet]);
             instructions = body.subarray(startIdx);
         }
     }
 
-    return [baseObjectSize, deltifiedObjectSize, finalContent];
+    return [baseObjectSize, deltifiedObjectSize, finalBuffer];
 }

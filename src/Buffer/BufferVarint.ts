@@ -89,9 +89,9 @@ export class BufferVarint {
         return [offset, size, pointer];
     }
 
-    public getAddInstruction(buffer: Buffer): [string, number] {
+    public getAddInstruction(buffer: Buffer): [Buffer, number] {
         const size = buffer.subarray(0, 1).readUInt8();
-        const content = buffer.subarray(1, size + 1).toString();
-        return [content, size + 1];
+        const contentBuf = buffer.subarray(1, size + 1);
+        return [contentBuf, size + 1];
     }
 }
