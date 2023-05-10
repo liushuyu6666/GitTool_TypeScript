@@ -6,10 +6,8 @@ import { GitObjectType } from "../../Enum/GitObjectType";
 import blobParser from "./blobParser";
 import tagParser, { TagObjectInfo } from "./tagParser";
 
-export default function (body: Buffer, type: GitObjectType): string | GitTreeObjectFileEntry[] | CommitObjectInfo | TagObjectInfo | undefined {
+export default function (decryptedBuf: Buffer, type: GitObjectType): string | GitTreeObjectFileEntry[] | CommitObjectInfo | TagObjectInfo | undefined {
     if (!isUndeltifiedObject(type)) return;
-
-    const decryptedBuf = inflateSync(body);
 
     switch (type) {
         case GitObjectType.BLOB_DELTA: {

@@ -3,6 +3,7 @@ import { EntranceFile, EntranceNode } from '../../Entrance/Entrance';
 import deltifiedParser from './deltifiedParser';
 import undeltifiedParser from './undeltifiedParser';
 import path from 'path';
+import { inflateSync } from 'zlib';
 
 export default function(entranceFile: EntranceFile, outObjectDir: string) {
     const currDotPackPath = entranceFile.filePath;
@@ -20,7 +21,7 @@ export function dfsParser(
     currDotPackPath: string,
     currDotPack: Buffer,
     outObjectDir: string,
-    baseContent?: string
+    baseContent?: Buffer
 ) {
     // Get the compressed data (body)
     let shortestDistribution = node.distributions.find(
@@ -43,10 +44,10 @@ export function dfsParser(
     }
 
     // Parse the content of this current node
-    let newContent: string;
+    let newContent: Buffer;
     if(!baseContent) {
-        const data = undeltifiedParser(body, shortestDistribution.type!);
-        newContent = JSON.stringify(data);
+        newContent = inflateSync(body);
+        // newContent = undeltifiedParser(body, shortestDistribution.type!);
     } else {
         newContent = deltifiedParser(body, baseContent)[2];
     }
@@ -60,7 +61,8 @@ export function dfsParser(
             ${baseContent}`
         );
     }
-    writeFileSync(outFile, newContent);
+    const output = JSON.stringify(undeltifiedParser(newContent, shortestDistribution.type!));
+    writeFileSync(outFile, output);
 
     // Next node
     for(const nextNode of node.nextNodes) {
