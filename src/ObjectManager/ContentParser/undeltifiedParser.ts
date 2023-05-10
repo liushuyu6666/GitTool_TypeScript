@@ -4,8 +4,9 @@ import treeParser, { GitTreeObjectFileEntry } from "./treeParser";
 import commitParser, { CommitObjectInfo } from "./commitParser";
 import { GitObjectType } from "../../Enum/GitObjectType";
 import blobParser from "./blobParser";
+import tagParser, { TagObjectInfo } from "./tagParser";
 
-export default function (body: Buffer, type: GitObjectType): string | GitTreeObjectFileEntry[] | CommitObjectInfo | undefined {
+export default function (body: Buffer, type: GitObjectType): string | GitTreeObjectFileEntry[] | CommitObjectInfo | TagObjectInfo | undefined {
     if (!isUndeltifiedObject(type)) return;
 
     const decryptedBuf = inflateSync(body);
@@ -19,6 +20,9 @@ export default function (body: Buffer, type: GitObjectType): string | GitTreeObj
         }
         case GitObjectType.COMMIT_DELTA: {
             return commitParser(decryptedBuf);
+        }
+        case GitObjectType.TAG_DELTA: {
+            return tagParser(decryptedBuf);
         }
         default: {
             return;
