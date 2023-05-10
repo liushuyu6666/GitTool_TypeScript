@@ -1,4 +1,4 @@
-import { Entrance } from "../Entrance/Entrance";
+import { Entrance } from "./Entrance";
 import { GitObject } from "../GitObject/GitObject";
 import { isLooseObject } from "../utils/getGitObjectType";
 import { LooseObjectGenerator } from "./ObjectGenerator/LooseObjectGenerator";

@@ -1,4 +1,4 @@
-import { BufferVarint } from "../../Buffer/BufferVarint";
+import { BufferVarint } from "../Buffer/BufferVarint";
 
 /**
  * 

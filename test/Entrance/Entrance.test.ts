@@ -1,4 +1,4 @@
-import { Entrance } from "../../src/Entrance/Entrance";
+import { Entrance } from "../../src/ObjectManager/Entrance";
 import { GitObjectType } from "../../src/Enum/GitObjectType"
 import { GitObject } from "../../src/GitObject/GitObject"
 

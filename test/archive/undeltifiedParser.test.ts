@@ -1,10 +1,10 @@
 import { readFileSync } from "fs";
-import { GitObjectType } from "../../../src/Enum/GitObjectType";
-import { CommitObjectInfo } from "../../../src/ObjectManager/ContentParser/commitParser";
-import { GitTreeObjectFileEntry } from "../../../src/ObjectManager/ContentParser/treeParser";
-import undeltifiedParser from "../../../src/ObjectManager/ContentParser/undeltifiedParser";
+import { GitObjectType } from "../../src/Enum/GitObjectType";
+import { CommitObjectInfo } from "../../src/ObjectManager/ContentParser/commitParser";
+import { GitTreeObjectFileEntry } from "../../src/ObjectManager/ContentParser/treeParser";
+import { undeltifiedParser } from "../../src/archive/undeltifiedParser";
 
-describe('Test undeltifiedParser,', () => {
+describe('Test the undeltifiedParser method in the Entrance class,', () => {
     test('for parsing blob_delta object', () => {
         const filePath =
             'testCases/prodExample/git/objects/pack/pack-13995ffd6c5efdbeb96104a3c58d178c73a77926.pack';

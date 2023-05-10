@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs';
 // import { inflateSync } from 'zlib';
 import { inflateSync } from 'zlib';
-import deltifiedParser from '../../../src/ObjectManager/ContentParser/deltifiedParser';
-import treeParser from '../../../src/ObjectManager/ContentParser/treeParser';
+import deltifiedParser from '../../src/archive/deltifiedParser';
+import treeParser from '../../src/ObjectManager/ContentParser/treeParser';
 
 describe('Test deltifiedParser function,', () => {
     test('to parse the deltified blob object.', () => {
