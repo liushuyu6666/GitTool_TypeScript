@@ -104,7 +104,7 @@ describe("Test the Entrance class", () => {
     /**
      *   entranceFiles[0] ---+--- entranceFiles[1]
      *                       |
-     *                entranceNode['object1'] -> (inflations[0], inflations[1])
+     *                entranceNode['object1'] -> (distributions[0], distributions[1])
      *                       |
      *                entranceNode['object8']
      */
@@ -117,8 +117,8 @@ describe("Test the Entrance class", () => {
         expect(entrance.entranceFiles[0].filePath).toBe('file1');
         expect(entrance.entranceFiles[1].filePath).toBe('file3');
         expect(entrance.entranceFiles[0].nextNodes[0]).toBe(entrance.entranceFiles[1].nextNodes[0]);
-        expect(entrance.entranceFiles[0].nextNodes[0].inflations[0].filePath).toBe('file1');
-        expect(entrance.entranceFiles[0].nextNodes[0].inflations[1].filePath).toBe('file3');
+        expect(entrance.entranceFiles[0].nextNodes[0].distributions[0].filePath).toBe('file1');
+        expect(entrance.entranceFiles[0].nextNodes[0].distributions[1].filePath).toBe('file3');
         expect(entrance.entranceFiles[0].nextNodes[0].hash).toBe('object1');
         expect(entrance.entranceFiles[1].nextNodes[0].hash).toBe('object1');
         expect(entrance.entranceFiles[1].nextNodes[0].nextNodes[0].hash).toBe('object8');

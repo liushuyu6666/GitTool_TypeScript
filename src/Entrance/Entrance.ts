@@ -1,12 +1,14 @@
 import { GitObjectType } from '../Enum/GitObjectType';
 import { GitObject } from '../GitObject/GitObject';
 
-export interface Inflation {
+export interface Distribution {
     filePath: string;
 
     bodyStartIdx: number;
 
     bodyEndIdx: number;
+
+    type: GitObjectType;
 }
 
 /**
@@ -15,15 +17,13 @@ export interface Inflation {
 export class EntranceNode {
     hash: string;
 
-    type: GitObjectType | undefined;
-
     nextNodes: EntranceNode[];
 
-    inflations: Inflation[];
+    distributions: Distribution[];
 
     constructor(hash: string) {
         this.hash = hash;
-        this.inflations = [];
+        this.distributions = [];
         this.nextNodes = [];
     }
 }
@@ -74,15 +74,15 @@ export class Entrance {
             entranceNode = this._mapToEntranceNode.get(gitObject.hash)!;
         } else {
             entranceNode = new EntranceNode(gitObject.hash);
-            entranceNode.type = gitObject.gitObjectType;
             this._mapToEntranceNode.set(gitObject.hash, entranceNode);
         }
-        const inflation: Inflation = {
+        const inflation: Distribution = {
             bodyStartIdx: gitObject.startIdx ?? 0,
             bodyEndIdx: gitObject.endIdx ?? 0,
             filePath: gitObject.filePath ?? '',
+            type: gitObject.gitObjectType!
         };
-        entranceNode.inflations.push(inflation);
+        entranceNode.distributions.push(inflation);
 
         return entranceNode;
     }
