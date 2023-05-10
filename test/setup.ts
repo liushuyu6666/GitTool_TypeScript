@@ -1,4 +1,6 @@
 import { readFileSync } from "fs";
+import { GitObject } from "../src/GitObject/GitObject";
+import { GitObjectType } from "../src/Enum/GitObjectType";
 
 export default function() {
     // TODO: should be configured in the .env
@@ -11,9 +13,20 @@ export default function() {
     (global as any).fakeDeltifiedTree = getFakeObject(fakeObjects['deltified_tree']);
     (global as any).fakeDeltifiedCommit = getFakeObject(fakeObjects['deltified_commit']);
 
+    (global as any).objectBlobDelta = generateGitObject(fakeObjects['blob_delta']);
+    (global as any).objectTreeDelta = generateGitObject(fakeObjects['tree_delta']);
+    (global as any).objectCommitDelta = generateGitObject(fakeObjects['commit_delta']);
+    (global as any).objectDeltifiedBlob = generateGitObject(fakeObjects['deltified_blob']);
+    (global as any).objectDeltifiedTree = generateGitObject(fakeObjects['deltified_tree']);
+    (global as any).objectDeltifiedCommit = generateGitObject(fakeObjects['deltified_commit']);
+
 }
 
 interface FakeObject {
+    hash: string;
+    size: number;
+    type: GitObjectType;
+    baseHash?: string;
     filePath: string;
     startIdx: number;
     endIdx: number;
@@ -24,4 +37,16 @@ function getFakeObject (object: FakeObject) {
     const endIdx = object.endIdx;
     const content = readFileSync(filePath);
     return content.subarray(startIdx, endIdx);
+}
+
+function generateGitObject (object: FakeObject) {
+    return new GitObject(
+        object.hash,
+        object.type,
+        object.size,
+        object.baseHash,
+        object.filePath,
+        object.startIdx,
+        object.endIdx
+    )
 }

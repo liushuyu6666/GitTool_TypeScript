@@ -1,35 +1,53 @@
 {
     "blob_delta": {
+        "hash": "bbc679138a183e60ea3f2c15d84f4f536b70c16e",
+        "baseHash": null,
+        "size": 87,
         "filePath": "testCases/prodExample/git/objects/pack/pack-13995ffd6c5efdbeb96104a3c58d178c73a77926.pack",
         "startIdx": 125383,
         "endIdx": 125954,
         "type": "blob_delta"
     },
     "deltified_blob": {
+        "hash": "4327b9e2fc5fc324892732a6017f347519306191",
+        "baseHash": "bbc679138a183e60ea3f2c15d84f4f536b70c16e",
+        "size": 1157,
         "filePath": "testCases/prodExample/git/objects/pack/pack-13995ffd6c5efdbeb96104a3c58d178c73a77926.pack",
         "startIdx": 22696,
         "endIdx": 22761,
         "type": "ref_delta"
     },
     "tree_delta": {
+        "hash": "0279fe316640ae92aaf57d2ff1acfd99db6ed160",
+        "baseHash": null,
+        "size": 33,
         "filePath": "testCases/prodExample/git/objects/pack/pack-25f18e15f9f7da53f70b8a7e724678e1e028a4a2.pack",
         "startIdx": 223375,
         "endIdx": 223847,
         "type": "tree_delta"
     },
     "deltified_tree": {
+        "hash": "a45adb66dc103aa8c44e5f05026010048cde9299",
+        "baseHash": "0279fe316640ae92aaf57d2ff1acfd99db6ed160",
+        "size": 1923,
         "filePath": "testCases/prodExample/git/objects/pack/pack-25f18e15f9f7da53f70b8a7e724678e1e028a4a2.pack",
         "startIdx": 224356,
         "endIdx": 224428,
         "type": "ofs_delta"
     },
     "commit_delta": {
+        "hash": "6b0bfe2735ba56e44ffee574ebc6fea7f4948844",
+        "baseHash": null,
+        "size": 146,
         "filePath": "testCases/prodExample/git/objects/pack/pack-b4156662b80c15137b9186ec1a170d80307d9b2a.pack",
         "startIdx": 44230,
         "endIdx": 44445,
         "type": "commit_delta"
     },
     "deltified_commit": {
+        "hash": "7beafd1d3129ee7ddeb553cbdd944d4855c2702a",
+        "baseHash": "6b0bfe2735ba56e44ffee574ebc6fea7f4948844",
+        "size": 1414,
         "filePath": "testCases/prodExample/git/objects/pack/pack-b4156662b80c15137b9186ec1a170d80307d9b2a.pack",
         "startIdx": 59872,
         "endIdx": 59976,
