@@ -8,6 +8,7 @@ import commitParser, { CommitObjectInfo } from './ContentParser/commitParser';
 import tagParser, { TagObjectInfo } from './ContentParser/tagParser';
 import path from 'path';
 import { BufferVarint } from '../Buffer/BufferVarint';
+import { isUndeltifiedObject } from '../utils/getGitObjectType';
 
 export interface Distribution {
     filePath: string;
@@ -123,8 +124,22 @@ export class Entrance {
             const filePath = entranceFile.filePath;
             const file = readFileSync(filePath);
             for (const node of entranceFile.nextNodes) {
-                this._dfsParser(node, filePath, file, outObjectDir);
+                try {
+                    const undeltifiedType = this._getUndeltifiedType(node.distributions);
+                    this._dfsParser(node, filePath, file, undeltifiedType, outObjectDir);
+                } catch (e) {
+                    throw new Error(`${e} in ${node.hash}`);
+                }
             }
+        }
+    }
+
+    private _getUndeltifiedType(distributions: Distribution[]): GitObjectType {
+        const distribution = distributions.find((dis) => isUndeltifiedObject(dis.type));
+        if(!distribution) {
+            throw new Error(`Cannot find undeltified type of the undeltified node`);
+        } else {
+            return distribution.type;
         }
     }
 
@@ -132,6 +147,7 @@ export class Entrance {
         node: EntranceNode,
         filePath: string,
         file: Buffer,
+        baseType: GitObjectType, // must be an undeltified type for the undeltifiedParser to parse.
         outObjectDir?: string,
         baseBuffer?: Buffer,
     ) {
@@ -161,15 +177,16 @@ export class Entrance {
         // Print to the out file.
         if (outObjectDir) {
             const outFile = path.join(outObjectDir, node.hash);
+            // TODO: ensure the baseType keeps the same as its grandparent.
             const outStr = JSON.stringify(
-                this._undeltifiedParser(newBuffer, shortestDistribution.type!),
+                this._undeltifiedParser(newBuffer, baseType),
             );
             writeFileSync(outFile, outStr);
         }
 
         // Next node, the newBuffer will be the next BaseBuffer.
         for (const nextNode of node.nextNodes) {
-            this._dfsParser(nextNode, filePath, file, outObjectDir, newBuffer);
+            this._dfsParser(nextNode, filePath, file, baseType, outObjectDir, newBuffer);
         }
 
         return;
@@ -203,30 +220,40 @@ export class Entrance {
         }
     }
 
-    private _deltifiedParser(decryptedDeltaBuf: Buffer, baseBuffer: Buffer): [number, number, Buffer] {
+    private _deltifiedParser(
+        decryptedDeltaBuf: Buffer,
+        baseBuffer: Buffer,
+    ): [number, number, Buffer] {
         // Get the size of the base object.
         const bv1 = new BufferVarint(false);
-        const [baseObjectSize, endIdx1] = bv1.getSizeEncoding(decryptedDeltaBuf, 1);
-    
+        const [baseObjectSize, endIdx1] = bv1.getSizeEncoding(
+            decryptedDeltaBuf,
+            1,
+        );
+
         // Get the size of the deltified object.
         const bv2 = new BufferVarint(false);
         const remain = decryptedDeltaBuf.subarray(endIdx1);
         const [deltifiedObjectSize, endIdx2] = bv2.getSizeEncoding(remain, 1);
-    
+
         // Get the instructions
         let startIdx = endIdx1 + endIdx2;
         let instructions = decryptedDeltaBuf.subarray(startIdx);
-    
+
         let finalBuffer = Buffer.from([]);
-        while(instructions.length > 0) {
+        while (instructions.length > 0) {
             let flag = instructions[0] & 0b10000000;
             const bv = new BufferVarint(false);
-            if(flag) {
+            if (flag) {
                 // copy
-                const [offset, size, endIdx] = bv.getCopyInstruction(instructions);
+                const [offset, size, endIdx] =
+                    bv.getCopyInstruction(instructions);
                 startIdx += endIdx;
                 // TODO: The offset and size parameters should be applied to bytes instead according to the official documentation.
-                finalBuffer = Buffer.concat([finalBuffer, baseBuffer.subarray(offset, offset + size)]) ;
+                finalBuffer = Buffer.concat([
+                    finalBuffer,
+                    baseBuffer.subarray(offset, offset + size),
+                ]);
                 instructions = decryptedDeltaBuf.subarray(startIdx);
             } else {
                 // add
@@ -236,7 +263,7 @@ export class Entrance {
                 instructions = decryptedDeltaBuf.subarray(startIdx);
             }
         }
-    
+
         return [baseObjectSize, deltifiedObjectSize, finalBuffer];
     }
 }
