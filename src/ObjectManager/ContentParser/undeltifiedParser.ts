@@ -1,5 +1,4 @@
 import { isUndeltifiedObject } from "../../utils/getGitObjectType";
-import { inflateSync } from "zlib";
 import treeParser, { GitTreeObjectFileEntry } from "./treeParser";
 import commitParser, { CommitObjectInfo } from "./commitParser";
 import { GitObjectType } from "../../Enum/GitObjectType";
