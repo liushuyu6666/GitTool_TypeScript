@@ -3,7 +3,8 @@ import { GitObject } from "../GitObject/GitObject";
 import { isLooseObject } from "../utils/getGitObjectType";
 import { LooseObjectGenerator } from "./ObjectGenerator/LooseObjectGenerator";
 import { PackedObjectsGenerator } from "./ObjectGenerator/PackedObjectsGenerator";
-import { LooseObjectParser } from "./ContentParser/contentParse";
+import parseAndSaveLooseObject from "./ContentParser/parseAndSaveLooseObject";
+import entranceFileParser from "./ContentParser/entranceFileParser";
 
 export interface PackMapItem {
     prevHash: string;
@@ -20,6 +21,9 @@ export class ObjectManager {
     private _gitObjects: GitObject[];
 
     public entrance: Entrance;
+
+    private _packMap: Map<string, PackMapItem>;
+
     public get gitObjects(): GitObject[] {
         return this._gitObjects;
     }
@@ -27,7 +31,6 @@ export class ObjectManager {
         this._gitObjects = value;
     }
 
-    private _packMap: Map<string, PackMapItem>;
     public get packMap(): Map<string, PackMapItem> {
         return this._packMap;
     }
@@ -104,23 +107,32 @@ export class ObjectManager {
             this.generateGitObjects();
         }
         for(const gitObject of this.gitObjects) {
-            if(!isLooseObject(gitObject.gitObjectType!)){
-                this.entrance.insertGitObject(gitObject);}
+            if(!isLooseObject(gitObject.gitObjectType!)) {
+                this.entrance.insertGitObject(gitObject);
+            }
         }
         console.log(`entrance is generated.`);
         return this.entrance;
     }
 
-    parseContent() {
+    // TODO: Better to make the input parameter of the looseObjectParser to be the gitObject
+    parseAllContents() {
         if(!this._outObjectDir) {
             console.error('outObjectDir is not specified!');
             return;
         }
-        if(this.gitObjects && this.gitObjects.length === 0) {
-            this.generateGitObjects();
+        if(!this.entrance || this.entrance.entranceFiles.length === 0) {
+            this.generateEntrance();
         }
+
+        // Parse loose objects
         for(const gitObject of this._gitObjects) {
-            LooseObjectParser(gitObject, this._outObjectDir);
+            parseAndSaveLooseObject(gitObject, this._outObjectDir);
+        }
+
+        // Parse packed objects
+        for(const entranceFile of this.entrance.entranceFiles) {
+            entranceFileParser(entranceFile, this._outObjectDir);
         }
     }
 
