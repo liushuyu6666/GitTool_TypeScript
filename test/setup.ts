@@ -22,6 +22,7 @@ export default function() {
 
     (global as any).duplicatedTreeDelta1 = generateGitObject(fakeObjects['duplicated_tree_delta_1']);
     (global as any).duplicatedTreeDelta2 = generateGitObject(fakeObjects['duplicated_tree_delta_2']);
+    (global as any).refDelta = generateGitObject(fakeObjects['ref_delta']);
 
 }
 

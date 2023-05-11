@@ -1,3 +1,4 @@
+import { GitObjectType } from "../../src/Enum/GitObjectType";
 import { Entrance } from "../../src/ObjectManager/Entrance"
 
 describe("Test the Entrance class:", () => {
@@ -30,6 +31,17 @@ describe("Test the Entrance class:", () => {
     });
 
     describe("with a duplicated undeltified object,", () => {
+        /**
+         *                   Entrance
+         *                      |
+         *             +--------+--------+
+         *             |                 |
+         *      entranceFile1     entranceFile2
+         *             |                 |
+         *             +--------+--------+
+         *                      |
+         *                 entranceNode
+         */
         beforeAll(() => {
             entrance = new Entrance();
             entrance.insertGitObject((global as any).duplicatedTreeDelta1);
@@ -37,7 +49,6 @@ describe("Test the Entrance class:", () => {
         });
 
         test("to build the Entrance with 2 entranceFiles and 1 entranceNode properly.", () => {
-            console.log(entrance.entranceFiles[0].nextNodes[0].distributions);
             expect(entrance.entranceFiles.length).toBe(2);
             expect(entrance.entranceFiles[0].nextNodes.length).toBe(1);
             expect(entrance.entranceFiles[1].nextNodes.length).toBe(1);
@@ -46,7 +57,43 @@ describe("Test the Entrance class:", () => {
 
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
-            entrance.parse('test/ObjectManager/__snapshots__')
+            entrance.parse('test/ObjectManager/__snapshots__');
         })
+    });
+
+    describe("with a duplicated undeltified object and its ref_delta child,", () => {
+        /**
+         *                   Entrance
+         *                      |
+         *             +--------+--------+
+         *             |                 |
+         *      entranceFile1     entranceFile2
+         *             |                 |
+         *             +--------+--------+
+         *                      |
+         *            entranceNode (tree_delta)
+         *                      |
+         *            entranceNode (ref_delta)
+         */
+        beforeAll(() => {
+            entrance = new Entrance();
+            entrance.insertGitObject((global as any).duplicatedTreeDelta1);
+            entrance.insertGitObject((global as any).duplicatedTreeDelta2);
+            entrance.insertGitObject((global as any).refDelta);
+        });
+
+        test("to build the Entrance with 2 entranceFiles and 2 entranceNode properly.", () => {
+            expect(entrance.entranceFiles.length).toBe(2);
+            expect(entrance.entranceFiles[0].nextNodes.length).toBe(1);
+            expect(entrance.entranceFiles[1].nextNodes.length).toBe(1);
+            expect(entrance.entranceFiles[0].nextNodes[0]).toBe(entrance.entranceFiles[1].nextNodes[0]);
+            expect(entrance.entranceFiles[0].nextNodes[0].nextNodes[0].hash).toBe('a3f9482f80267d75bfc46517c5e76f00ebf0e8e6');
+            expect(entrance.entranceFiles[0].nextNodes[0].nextNodes[0].distributions[0].type).toBe(GitObjectType.REF_DELTA);
+        });
+
+        test("to parse the Entrance properly without error.", () => {
+            // TODO: configurable
+            entrance.parse('test/ObjectManager/__snapshots__');
+        });
     })
 });

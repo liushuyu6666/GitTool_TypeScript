@@ -70,5 +70,14 @@
         "startIdx": 939417,
         "endIdx": 939519,
         "type": "tree_delta"
+    },
+    "ref_delta": {
+        "hash": "a3f9482f80267d75bfc46517c5e76f00ebf0e8e6",
+        "baseHash": "c52ee19e013e437bf9c822e1865652c8471dd428",
+        "size": 1153,
+        "filePath": "testCases/prodExample/git/objects/pack/pack-b4156662b80c15137b9186ec1a170d80307d9b2a.pack",
+        "startIdx": 82625,
+        "endIdx": 82659,
+        "type": "ref_delta"
     }
 }

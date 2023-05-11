@@ -66,7 +66,6 @@ export class Entrance {
 
     // The gitObject should be a Packed Object
     public insertGitObject(gitObject: GitObject) {
-        console.log(gitObject);
         const curr = this._insertCurrGitObject(gitObject);
         if (gitObject.baseHash) {
             // For deltified object
@@ -127,19 +126,34 @@ export class Entrance {
             const file = readFileSync(filePath);
             for (const node of entranceFile.nextNodes) {
                 try {
-                    const undeltifiedType = this._getUndeltifiedType(node.distributions);
-                    this._dfsParser(node, filePath, file, undeltifiedType, outObjectDir);
+                    const undeltifiedType = this._getUndeltifiedType(
+                        node.distributions,
+                    );
+                    this._dfsParser(
+                        node,
+                        filePath,
+                        file,
+                        undeltifiedType,
+                        outObjectDir,
+                    );
                 } catch (e) {
-                    throw new Error(`${e} in ${node.hash}`);
+                    // Considering the fds function, the error may not come from the undeltified object itself.
+                    throw new Error(
+                        `${e} under the undeltified node ${node.hash}.`,
+                    );
                 }
             }
         }
     }
 
     private _getUndeltifiedType(distributions: Distribution[]): GitObjectType {
-        const distribution = distributions.find((dis) => isUndeltifiedObject(dis.type));
-        if(!distribution) {
-            throw new Error(`Cannot find undeltified type of the undeltified node`);
+        const distribution = distributions.find((dis) =>
+            isUndeltifiedObject(dis.type),
+        );
+        if (!distribution) {
+            throw new Error(
+                `Cannot find undeltified type of the undeltified node`,
+            );
         } else {
             return distribution.type;
         }
@@ -159,21 +173,28 @@ export class Entrance {
                 (distribution) => distribution.filePath === filePath,
             ) ?? node.distributions[0];
 
-        // Get the delta data (body)
-        const deltaBody = file.subarray(
+        // Get the body.
+        // For undeltified object, it is the deflated data.
+        // For deltified object, it is the compressed delta data.
+        const body = file.subarray(
             shortestDistribution.bodyStartIdx,
             shortestDistribution.bodyEndIdx,
         );
-        const decryptedDeltaBuf = inflateSync(deltaBody);
 
         // Get the newBuffer.
         let newBuffer: Buffer;
         if (!baseBuffer) {
             // Undeltified objects: the decryptedDeltaBuf should be the nextBaseBuffer.
-            newBuffer = decryptedDeltaBuf;
+            try {
+                newBuffer = inflateSync(body);
+            } catch (e) {
+                throw new Error(
+                    `${e} happens when inflating ${node.hash} (${shortestDistribution.type}) in ${shortestDistribution.filePath} (starts from ${shortestDistribution.bodyStartIdx}, ends at ${shortestDistribution.bodyEndIdx}).`,
+                );
+            }
         } else {
             // Deltified objects: decryptedDeltaBuf need to be applied on the baseBuffer to get the newBuffer.
-            newBuffer = this._deltifiedParser(decryptedDeltaBuf, baseBuffer)[2];
+            newBuffer = this._deltifiedParser(body, baseBuffer)[2];
         }
 
         // Print to the out file.
@@ -188,7 +209,14 @@ export class Entrance {
 
         // Next node, the newBuffer will be the next BaseBuffer.
         for (const nextNode of node.nextNodes) {
-            this._dfsParser(nextNode, filePath, file, baseType, outObjectDir, newBuffer);
+            this._dfsParser(
+                nextNode,
+                filePath,
+                file,
+                baseType,
+                outObjectDir,
+                newBuffer,
+            );
         }
 
         return;
