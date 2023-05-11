@@ -20,6 +20,9 @@ export default function() {
     (global as any).objectDeltifiedTree = generateGitObject(fakeObjects['deltified_tree']);
     (global as any).objectDeltifiedCommit = generateGitObject(fakeObjects['deltified_commit']);
 
+    (global as any).duplicatedTreeDelta1 = generateGitObject(fakeObjects['duplicated_tree_delta_1']);
+    (global as any).duplicatedTreeDelta2 = generateGitObject(fakeObjects['duplicated_tree_delta_2']);
+
 }
 
 interface FakeObject {
