@@ -66,6 +66,7 @@ export class Entrance {
 
     // The gitObject should be a Packed Object
     public insertGitObject(gitObject: GitObject) {
+        console.log(gitObject);
         const curr = this._insertCurrGitObject(gitObject);
         if (gitObject.baseHash) {
             // For deltified object
@@ -79,9 +80,10 @@ export class Entrance {
     private _insertCurrGitObject(gitObject: GitObject): EntranceNode {
         let entranceNode;
         if (this._mapToEntranceNode.has(gitObject.hash)) {
-            // For the duplicated gitObject
+            // For the duplicated gitObject, get the existing one.
             entranceNode = this._mapToEntranceNode.get(gitObject.hash)!;
         } else {
+            // Create a new one.
             entranceNode = new EntranceNode(gitObject.hash);
             this._mapToEntranceNode.set(gitObject.hash, entranceNode);
         }
