@@ -159,6 +159,16 @@ export class Entrance {
         }
     }
 
+    /**
+     * 
+     * @param node The entranceNode of the current object.
+     * @param filePath The file path of its connected entranceFile.
+     * @param file The file buffer read from the associated file path.
+     * @param baseType The base type of the current object, can be 
+     * @param outObjectDir 
+     * @param baseBuffer 
+     * @returns 
+     */
     private _dfsParser(
         node: EntranceNode,
         filePath: string,
@@ -167,47 +177,63 @@ export class Entrance {
         outObjectDir?: string,
         baseBuffer?: Buffer,
     ) {
-        // Get the shortest distribution.
-        const shortestDistribution =
-            node.distributions.find(
-                (distribution) => distribution.filePath === filePath,
-            ) ?? node.distributions[0];
-
-        // Get the body.
-        // For undeltified object, it is the deflated data.
-        // For deltified object, it is the compressed delta data.
-        const body = file.subarray(
-            shortestDistribution.bodyStartIdx,
-            shortestDistribution.bodyEndIdx,
+        // 1, Get the body through the shortest distribution or the first distribution
+        let body: Buffer;
+        let shortestDistribution = node.distributions.find(
+            (distribution) => distribution.filePath === filePath,
         );
+        if (!shortestDistribution) {
+            shortestDistribution = node.distributions[0];
+            const { filePath, bodyStartIdx, bodyEndIdx } = shortestDistribution;
+            body = readFileSync(filePath).subarray(bodyStartIdx, bodyEndIdx);
+        } else {
+            body = file.subarray(
+                shortestDistribution.bodyStartIdx,
+                shortestDistribution.bodyEndIdx,
+            );
+        }
 
-        // Get the newBuffer.
+        // 2, Get the deltaBuffer and newBuffer.
+        let deltaBuffer: Buffer;
+        try {
+            deltaBuffer = inflateSync(body);
+        } catch (e) {
+            throw new Error(
+                `${e} happens when inflating ${node.hash} (${shortestDistribution.type}) in ${shortestDistribution.filePath} (starts from ${shortestDistribution.bodyStartIdx}, ends at ${shortestDistribution.bodyEndIdx}).`,
+            );
+        }
+
+        // 3, Get the newBuffer from the deltaBuffer and the newBuffer.
         let newBuffer: Buffer;
-        if (!baseBuffer) {
-            // Undeltified objects: the decryptedDeltaBuf should be the nextBaseBuffer.
-            try {
-                newBuffer = inflateSync(body);
-            } catch (e) {
-                throw new Error(
-                    `${e} happens when inflating ${node.hash} (${shortestDistribution.type}) in ${shortestDistribution.filePath} (starts from ${shortestDistribution.bodyStartIdx}, ends at ${shortestDistribution.bodyEndIdx}).`,
+        if (baseBuffer) {
+            // For deltified objects
+            newBuffer = this._deltifiedParser(deltaBuffer, baseBuffer)[2];
+        } else {
+            // For undeltified objects
+            newBuffer = deltaBuffer;
+        }
+
+        // 4, Print to the specified outDir.
+        if (outObjectDir) {
+            const outFile = this._undeltifiedParser(newBuffer, baseType);
+            
+            // TODO: ensure the baseType keeps the same as its grandparent.
+            let outStr: string;
+            if(typeof outFile === 'string') {
+                outStr = outFile;
+            } else {
+                outStr = JSON.stringify(
+                    outFile,
+                    null,
+                    4,
                 );
             }
-        } else {
-            // Deltified objects: decryptedDeltaBuf need to be applied on the baseBuffer to get the newBuffer.
-            newBuffer = this._deltifiedParser(body, baseBuffer)[2];
+
+            const outFilePath = path.join(outObjectDir, node.hash);
+            writeFileSync(outFilePath, outStr);
         }
 
-        // Print to the out file.
-        if (outObjectDir) {
-            const outFile = path.join(outObjectDir, node.hash);
-            // TODO: ensure the baseType keeps the same as its grandparent.
-            const outStr = JSON.stringify(
-                this._undeltifiedParser(newBuffer, baseType),
-            );
-            writeFileSync(outFile, outStr);
-        }
-
-        // Next node, the newBuffer will be the next BaseBuffer.
+        // 5, Next node, the newBuffer will be the next BaseBuffer.
         for (const nextNode of node.nextNodes) {
             this._dfsParser(
                 nextNode,

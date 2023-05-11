@@ -18,22 +18,22 @@
         "type": "ref_delta"
     },
     "tree_delta": {
-        "hash": "0279fe316640ae92aaf57d2ff1acfd99db6ed160",
+        "hash": "05d92001658fa0e82c3a1063865cc7d66766caf6",
         "baseHash": null,
-        "size": 33,
-        "filePath": "testCases/prodExample/git/objects/pack/pack-25f18e15f9f7da53f70b8a7e724678e1e028a4a2.pack",
-        "startIdx": 223375,
-        "endIdx": 223847,
+        "size": 1589,
+        "filePath": "testCases/prodExample/git/objects/pack/pack-13995ffd6c5efdbeb96104a3c58d178c73a77926.pack",
+        "startIdx": 44921,
+        "endIdx": 45624,
         "type": "tree_delta"
     },
     "deltified_tree": {
-        "hash": "a45adb66dc103aa8c44e5f05026010048cde9299",
-        "baseHash": "0279fe316640ae92aaf57d2ff1acfd99db6ed160",
-        "size": 1923,
-        "filePath": "testCases/prodExample/git/objects/pack/pack-25f18e15f9f7da53f70b8a7e724678e1e028a4a2.pack",
-        "startIdx": 224356,
-        "endIdx": 224428,
-        "type": "ofs_delta"
+        "hash": "f6b00c55c1e91a0bd517b19519fcb43f376a77f6",
+        "baseHash": "05d92001658fa0e82c3a1063865cc7d66766caf6",
+        "size": 1283,
+        "filePath": "testCases/prodExample/git/objects/pack/pack-13995ffd6c5efdbeb96104a3c58d178c73a77926.pack",
+        "startIdx": 9999,
+        "endIdx": 10068,
+        "type": "ref_delta"
     },
     "commit_delta": {
         "hash": "6b0bfe2735ba56e44ffee574ebc6fea7f4948844",
@@ -79,5 +79,32 @@
         "startIdx": 82625,
         "endIdx": 82659,
         "type": "ref_delta"
+    },
+    "tag_delta": {
+        "hash": "d2e26bb153bd5b2e21fdaa4b3a76d58968ccc692",
+        "baseHash": null,
+        "size": 905,
+        "filePath": "testCases/prodExample/git/objects/pack/pack-25f18e15f9f7da53f70b8a7e724678e1e028a4a2.pack",
+        "startIdx": 9865,
+        "endIdx": 10004,
+        "type": "tag_delta"
+    },
+    "deltified_tag_1": {
+        "hash": "a638a50e277cc6093c109f5170737028bd065ea3",
+        "baseHash": "d2e26bb153bd5b2e21fdaa4b3a76d58968ccc692",
+        "size": 1537,
+        "filePath": "testCases/prodExample/git/objects/pack/pack-25f18e15f9f7da53f70b8a7e724678e1e028a4a2.pack",
+        "startIdx": 10008,
+        "endIdx": 10044,
+        "type": "ofs_delta"
+    },
+    "deltified_tag_2": {
+        "hash": "e779b973048e7b5c4be558a9c27bb3cc6a9e97d9",
+        "baseHash": "d2e26bb153bd5b2e21fdaa4b3a76d58968ccc692",
+        "size": "1794",
+        "filePath": "testCases/prodExample/git/objects/pack/pack-25f18e15f9f7da53f70b8a7e724678e1e028a4a2.pack",
+        "startIdx": 10048,
+        "endIdx": 10102,
+        "type": "ofs_delta"
     }
 }

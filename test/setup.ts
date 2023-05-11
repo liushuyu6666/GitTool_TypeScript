@@ -24,6 +24,10 @@ export default function() {
     (global as any).duplicatedTreeDelta2 = generateGitObject(fakeObjects['duplicated_tree_delta_2']);
     (global as any).refDelta = generateGitObject(fakeObjects['ref_delta']);
 
+    (global as any).tagDelta = generateGitObject(fakeObjects['tag_delta']);
+    (global as any).deltifiedTag1 = generateGitObject(fakeObjects['deltified_tag_1']);
+    (global as any).deltifiedTag2 = generateGitObject(fakeObjects['deltified_tag_2']);
+
 }
 
 interface FakeObject {

@@ -1,4 +1,3 @@
-import { GitObjectType } from "../../src/Enum/GitObjectType";
 import { Entrance } from "../../src/ObjectManager/Entrance"
 
 describe("Test the Entrance class:", () => {
@@ -16,12 +15,7 @@ describe("Test the Entrance class:", () => {
         });
     
         test("to build the Entrance properly.", () => {
-            expect(entrance.entranceFiles.length).toBe(3);
-            expect(entrance.entranceFiles.map(enf => enf.filePath)).toEqual([
-                "testCases/prodExample/git/objects/pack/pack-13995ffd6c5efdbeb96104a3c58d178c73a77926.pack",
-                "testCases/prodExample/git/objects/pack/pack-25f18e15f9f7da53f70b8a7e724678e1e028a4a2.pack",
-                "testCases/prodExample/git/objects/pack/pack-b4156662b80c15137b9186ec1a170d80307d9b2a.pack"
-            ]);
+            expect(entrance).toMatchSnapshot();
         });
     
         test("to parse the Entrance properly without error.", () => {
@@ -49,10 +43,7 @@ describe("Test the Entrance class:", () => {
         });
 
         test("to build the Entrance with 2 entranceFiles and 1 entranceNode properly.", () => {
-            expect(entrance.entranceFiles.length).toBe(2);
-            expect(entrance.entranceFiles[0].nextNodes.length).toBe(1);
-            expect(entrance.entranceFiles[1].nextNodes.length).toBe(1);
-            expect(entrance.entranceFiles[0].nextNodes[0]).toBe(entrance.entranceFiles[1].nextNodes[0]);
+            expect(entrance).toMatchSnapshot();
         });
 
         test("to parse the Entrance properly without error.", () => {
@@ -67,7 +58,7 @@ describe("Test the Entrance class:", () => {
          *                      |
          *             +--------+--------+
          *             |                 |
-         *      entranceFile1     entranceFile2
+         *       entranceFile1     entranceFile2
          *             |                 |
          *             +--------+--------+
          *                      |
@@ -83,17 +74,41 @@ describe("Test the Entrance class:", () => {
         });
 
         test("to build the Entrance with 2 entranceFiles and 2 entranceNode properly.", () => {
-            expect(entrance.entranceFiles.length).toBe(2);
-            expect(entrance.entranceFiles[0].nextNodes.length).toBe(1);
-            expect(entrance.entranceFiles[1].nextNodes.length).toBe(1);
-            expect(entrance.entranceFiles[0].nextNodes[0]).toBe(entrance.entranceFiles[1].nextNodes[0]);
-            expect(entrance.entranceFiles[0].nextNodes[0].nextNodes[0].hash).toBe('a3f9482f80267d75bfc46517c5e76f00ebf0e8e6');
-            expect(entrance.entranceFiles[0].nextNodes[0].nextNodes[0].distributions[0].type).toBe(GitObjectType.REF_DELTA);
+            expect(entrance).toMatchSnapshot()
         });
 
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
             entrance.parse('test/ObjectManager/__snapshots__');
         });
-    })
+    });
+
+    describe("with a tag object and its 2 ofs_delta childs,", () => {
+        /**
+         *                   Entrance
+         *                      |
+         *                 entranceFile
+         *                      |
+         *                 entranceNode
+         *             +--------+--------+
+         *             |                 |
+         *       entranceNode       entranceNode
+         *
+         */
+        beforeAll(() => {
+            entrance = new Entrance();
+            entrance.insertGitObject((global as any).tagDelta);
+            entrance.insertGitObject((global as any).deltifiedTag1);
+            entrance.insertGitObject((global as any).deltifiedTag2);
+        });
+
+        test("to build the Entrance with 1 entranceFiles and 3 entranceNode properly.", () => {
+            expect(entrance).toMatchSnapshot()
+        });
+
+        test("to parse the Entrance properly without error.", () => {
+            // TODO: configurable
+            entrance.parse('test/ObjectManager/__snapshots__');
+        });
+    });
 });
