@@ -1,0 +1,11 @@
+{
+    "looseFiles": {
+        "blob": "testCases/prodExample/git/objects/02/90bc0040ef1629196dc6799a4c6448f6ce561c",
+        "tree": "testCases/prodExample/git/objects/25/8ab1f68fdc266323e74b00fadbcb189a9d0e36",
+        "commit": "testCases/prodExample/git/objects/82/898910023dde8b8520c851434dca955e3da6bc"
+    },
+    "packedFiles": [
+        "testCases/prodExample/git/objects/pack/pack-d340dd20322ba96dfcfbace3e792a71085233865",
+        "testCases/prodExample/git/objects/pack/pack-b6463aad946381af9fbc6ab91ed223d6354ccfc4"
+    ]
+}

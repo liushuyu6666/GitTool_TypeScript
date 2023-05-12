@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
-import { GitObject } from "../src/GitObject/GitObject";
 import { GitObjectType } from "../src/Enum/GitObjectType";
+import { GitObject } from "../src/ObjectManager/GitObjectContainer/GitObjectContainer";
 
 export default function() {
     // TODO: should be configured in the .env
@@ -28,6 +28,15 @@ export default function() {
     (global as any).deltifiedTag1 = generateGitObject(fakeObjects['deltified_tag_1']);
     (global as any).deltifiedTag2 = generateGitObject(fakeObjects['deltified_tag_2']);
 
+
+    const fakeFilePaths = JSON.parse(readFileSync('test/fixture/mock_file_paths.json', 'utf8'));
+    const looseFilePaths = fakeFilePaths['looseFiles'];
+    const packedFilePaths = fakeFilePaths['packedFiles'];
+
+    (global as any).fakeBlobFilePath = looseFilePaths['blob'];
+    (global as any).fakeTreeFilePath = looseFilePaths['tree'];
+    (global as any).fakeCommitFilePath = looseFilePaths['commit'];
+    (global as any).fakePackedFilePaths = packedFilePaths;
 }
 
 interface FakeObject {
@@ -39,6 +48,7 @@ interface FakeObject {
     startIdx: number;
     endIdx: number;
 }
+
 function getFakeObject (object: FakeObject) {
     const filePath = object.filePath;
     const startIdx = object.startIdx;
