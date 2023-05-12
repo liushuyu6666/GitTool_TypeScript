@@ -30,13 +30,17 @@ export default function() {
 
 
     const fakeFilePaths = JSON.parse(readFileSync('test/fixture/mock_file_paths.json', 'utf8'));
-    const looseFilePaths = fakeFilePaths['looseFiles'];
-    const packedFilePaths = fakeFilePaths['packedFiles'];
+    const looseFilePaths = fakeFilePaths['looseFileSamples'];
+    const packedFilePaths = fakeFilePaths['packedFilePaths'];
+    const prodLooseFilePaths = fakeFilePaths['looseFilePaths'];
+    const outDir = fakeFilePaths['outFile'];
 
     (global as any).fakeBlobFilePath = looseFilePaths['blob'];
     (global as any).fakeTreeFilePath = looseFilePaths['tree'];
     (global as any).fakeCommitFilePath = looseFilePaths['commit'];
     (global as any).fakePackedFilePaths = packedFilePaths;
+    (global as any).fakeLooseFilePaths = prodLooseFilePaths;
+    (global as any).outDir = outDir;
 }
 
 interface FakeObject {

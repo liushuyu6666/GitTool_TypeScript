@@ -23,7 +23,7 @@ export class ObjectManager {
         this._outObjectDir = outObjectDir;
 
         this.gitObjectContainer = new GitObjectContainer(this._looseFilePaths, this._packedFilePaths);
-        this.packMapContainer = new PackMapContainer(this.gitObjectContainer.looseObjectsContainer);
+        this.packMapContainer = new PackMapContainer(this.gitObjectContainer.allObjectsContainer);
         this.entrance = new Entrance(this.gitObjectContainer.packedObjectsContainer);
     }
 
