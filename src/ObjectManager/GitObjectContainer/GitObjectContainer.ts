@@ -89,16 +89,33 @@ export class GitObjectContainer {
 
     packedObjectsContainer: GitObject[];
 
+    allObjectsContainer: GitObject[];
+
     // Count the occurrence number of each hash.
     mapToObject: Map<string, number>;
 
-    constructor() {
+    constructor(looseFilePaths: string[], packedFilePaths: string[]) {
         this.looseObjectsContainer = [];
 
         this.packedObjectsContainer = [];
 
+        // There are some duplicated objects
+        this.allObjectsContainer = [];
+
         // There are some duplicated packed objects.
         this.mapToObject = new Map<string, number>();
+
+        for(const looseFilePath of looseFilePaths) {
+            this.generateLooseObject(looseFilePath);
+        }
+        for(const packedFilePath of packedFilePaths) {
+            this.generatePackedObjects(packedFilePath);
+        }
+
+        this.allObjectsContainer.push(...this.looseObjectsContainer);
+        this.allObjectsContainer.push(...this.packedObjectsContainer);
+
+        console.log(`${this.looseObjectsContainer.length} loose git objects are generated.\n${this.packedObjectsContainer.length} packed git objects are generated.`);
     }
 
     private _splitHeaderAndBody(
@@ -365,7 +382,7 @@ export class GitObjectContainer {
         this._addOrUpdateMapToObject(hash);
     }
 
-    generatePackedObjects(packedFilePath: string): void {
+    public generatePackedObjects(packedFilePath: string): void {
         const dotIdxFilePath = `${packedFilePath}.idx`;
         const dotPackFilePath = `${packedFilePath}.pack`;
 
