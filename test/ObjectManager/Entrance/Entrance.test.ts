@@ -20,7 +20,7 @@ describe("Test the Entrance class:", () => {
     
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
-            entrance.parse('./__snapshots__');
+            entrance.parse('./test/ObjectManager/Entrance/__snapshots__');
         });
     });
 
@@ -48,7 +48,7 @@ describe("Test the Entrance class:", () => {
 
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
-            entrance.parse('./__snapshots__');
+            entrance.parse('./test/ObjectManager/Entrance/__snapshots__');
         })
     });
 
@@ -79,7 +79,7 @@ describe("Test the Entrance class:", () => {
 
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
-            entrance.parse('./__snapshots__');
+            entrance.parse('./test/ObjectManager/Entrance/__snapshots__');
         });
     });
 
@@ -108,7 +108,7 @@ describe("Test the Entrance class:", () => {
 
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
-            entrance.parse('./__snapshots__');
+            entrance.parse('./test/ObjectManager/Entrance/__snapshots__');
         });
     });
 });
