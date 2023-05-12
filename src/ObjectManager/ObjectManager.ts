@@ -21,28 +21,12 @@ export class ObjectManager {
         this._looseFilePaths = looseFilePaths;
         this._packedFilePaths = packedFilePaths;
         this._outObjectDir = outObjectDir;
-        this.gitObjectContainer = new GitObjectContainer();
+
+        this.gitObjectContainer = new GitObjectContainer(this._looseFilePaths, this._packedFilePaths);
+        this.packMapContainer = new PackMapContainer(this.gitObjectContainer.looseObjectsContainer);
         this.entrance = new Entrance();
         
-
-        this.generateGitObjects();
         this.generateEntrance();
-
-        this.packMapContainer = new PackMapContainer(this.gitObjectContainer.looseObjectsContainer);
-    }
-
-    // There are some duplicated gitObjects.
-    generateGitObjects() {
-        for(const looseFilePath of this._looseFilePaths) {
-            this.gitObjectContainer.generateLooseObject(looseFilePath);
-        }
-        for(const packedFilePath of this._packedFilePaths) {
-            this.gitObjectContainer.generatePackedObjects(packedFilePath);
-        }
-
-        console.log(`${this.gitObjectContainer.looseObjectsContainer.length} loose git objects are generated.\n${this.gitObjectContainer.packedObjectsContainer.length} packed git objects are generated.`);
-
-        // logMemoryUsage();
     }
 
     generateEntrance(): void {

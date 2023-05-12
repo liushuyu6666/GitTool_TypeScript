@@ -5,7 +5,7 @@ describe("Test the GitObjectContainer class,", () => {
 
     describe("upon loose file path:", () => {
         beforeEach(() => {
-            gitObjectContainer = new GitObjectContainer();
+            gitObjectContainer = new GitObjectContainer([], []);
         });
 
         test("to generate a blob object.", () => {
@@ -26,7 +26,7 @@ describe("Test the GitObjectContainer class,", () => {
     
     describe("upon packed file path:", () => {
         beforeEach(() => {
-            gitObjectContainer = new GitObjectContainer();
+            gitObjectContainer = new GitObjectContainer([], []);
         });
 
         test("to generate packed objects from one file.", () => {
