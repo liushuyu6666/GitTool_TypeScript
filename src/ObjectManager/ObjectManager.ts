@@ -1,4 +1,4 @@
-import { Entrance } from "./Entrance";
+import { Entrance } from "./Entrance/Entrance";
 import { GitObjectContainer } from "./GitObjectContainer/GitObjectContainer";
 
 export interface PackMapItem {
@@ -13,7 +13,7 @@ export class ObjectManager {
 
     private _outObjectDir: string | undefined;
 
-    private _gitObjectContainer: GitObjectContainer;
+    public gitObjectContainer: GitObjectContainer;
 
     public entrance: Entrance;
 
@@ -30,30 +30,30 @@ export class ObjectManager {
         this._looseFilePaths = looseFilePaths;
         this._packedFilePaths = packedFilePaths;
         this._outObjectDir = outObjectDir;
-        this._gitObjectContainer = new GitObjectContainer();
+        this.gitObjectContainer = new GitObjectContainer();
+        this.entrance = new Entrance();
 
         this.generateGitObjects();
+        this.generateEntrance();
         this._packMap = new Map<string, PackMapItem>();
-        this.entrance = new Entrance();
-        
     }
 
     // There are some duplicated gitObjects.
     generateGitObjects() {
         for(const looseFilePath of this._looseFilePaths) {
-            this._gitObjectContainer.generateLooseObject(looseFilePath);
+            this.gitObjectContainer.generateLooseObject(looseFilePath);
         }
         for(const packedFilePath of this._packedFilePaths) {
-            this._gitObjectContainer.generatePackedObjects(packedFilePath);
+            this.gitObjectContainer.generatePackedObjects(packedFilePath);
         }
 
-        console.log(`${this._gitObjectContainer.looseObjectsContainer.length} loose git objects are generated.\n${this._gitObjectContainer.packedObjectsContainer.length} packed git objects are generated.`);
+        console.log(`${this.gitObjectContainer.looseObjectsContainer.length} loose git objects are generated.\n${this.gitObjectContainer.packedObjectsContainer.length} packed git objects are generated.`);
 
         // logMemoryUsage();
     }
 
     generatePackMap(): Map<string, PackMapItem> {
-        for(const gitObject of this._gitObjectContainer.looseObjectsContainer.concat(this._gitObjectContainer.packedObjectsContainer)) {
+        for(const gitObject of this.gitObjectContainer.looseObjectsContainer.concat(this.gitObjectContainer.packedObjectsContainer)) {
             const prevHash = gitObject.baseHash ?? '';
             const currHash = gitObject.hash;
 
@@ -82,12 +82,11 @@ export class ObjectManager {
         return this._packMap;
     }
 
-    generateEntrance(): Entrance {
-        for(const packedGitObject of this._gitObjectContainer.packedObjectsContainer) {
+    generateEntrance(): void {
+        for(const packedGitObject of this.gitObjectContainer.packedObjectsContainer) {
             this.entrance.insertGitObject(packedGitObject);
         }
         console.log(`entrance is generated.`);
-        return this.entrance;
     }
 
     // TODO: Better to make the input parameter of the looseObjectParser to be the gitObject
@@ -101,7 +100,7 @@ export class ObjectManager {
 
     gitObjectToJson(): Object[] {
         const gitObjectJson: Object[] = [];
-        for (const gitObject of this._gitObjectContainer.looseObjectsContainer.concat(this._gitObjectContainer.packedObjectsContainer)) {
+        for (const gitObject of this.gitObjectContainer.looseObjectsContainer.concat(this.gitObjectContainer.packedObjectsContainer)) {
             gitObjectJson.push(gitObject.toJson());
         }
         return gitObjectJson

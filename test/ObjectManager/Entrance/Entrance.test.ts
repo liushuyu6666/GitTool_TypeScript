@@ -1,4 +1,4 @@
-import { Entrance } from "../../src/ObjectManager/Entrance"
+import { Entrance } from "../../../src/ObjectManager/Entrance/Entrance"
 
 describe("Test the Entrance class:", () => {
     let entrance: Entrance;
@@ -20,7 +20,7 @@ describe("Test the Entrance class:", () => {
     
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
-            entrance.parse('test/ObjectManager/__snapshots__');
+            entrance.parse('./__snapshots__');
         });
     });
 
@@ -48,7 +48,7 @@ describe("Test the Entrance class:", () => {
 
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
-            entrance.parse('test/ObjectManager/__snapshots__');
+            entrance.parse('./__snapshots__');
         })
     });
 
@@ -79,7 +79,7 @@ describe("Test the Entrance class:", () => {
 
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
-            entrance.parse('test/ObjectManager/__snapshots__');
+            entrance.parse('./__snapshots__');
         });
     });
 
@@ -108,7 +108,7 @@ describe("Test the Entrance class:", () => {
 
         test("to parse the Entrance properly without error.", () => {
             // TODO: configurable
-            entrance.parse('test/ObjectManager/__snapshots__');
+            entrance.parse('./__snapshots__');
         });
     });
 });
