@@ -1,10 +1,8 @@
 import { Entrance } from "./Entrance/Entrance";
 import { GitObjectContainer } from "./GitObjectContainer/GitObjectContainer";
+import { PackMapContainer } from "./PackMap/PackMapContainer";
 
-export interface PackMapItem {
-    prevHash: string;
-    nextHashes: Set<string>;
-}
+
 
 export class ObjectManager {
     private _looseFilePaths: string[];
@@ -17,14 +15,7 @@ export class ObjectManager {
 
     public entrance: Entrance;
 
-    private _packMap: Map<string, PackMapItem>;
-
-    public get packMap(): Map<string, PackMapItem> {
-        return this._packMap;
-    }
-    public set packMap(value: Map<string, PackMapItem>) {
-        this._packMap = value;
-    }
+    public packMapContainer: PackMapContainer;
 
     constructor(looseFilePaths: string[], packedFilePaths: string[], outObjectDir?: string) {
         this._looseFilePaths = looseFilePaths;
@@ -32,10 +23,12 @@ export class ObjectManager {
         this._outObjectDir = outObjectDir;
         this.gitObjectContainer = new GitObjectContainer();
         this.entrance = new Entrance();
+        
 
         this.generateGitObjects();
         this.generateEntrance();
-        this._packMap = new Map<string, PackMapItem>();
+
+        this.packMapContainer = new PackMapContainer(this.gitObjectContainer.looseObjectsContainer);
     }
 
     // There are some duplicated gitObjects.
@@ -50,36 +43,6 @@ export class ObjectManager {
         console.log(`${this.gitObjectContainer.looseObjectsContainer.length} loose git objects are generated.\n${this.gitObjectContainer.packedObjectsContainer.length} packed git objects are generated.`);
 
         // logMemoryUsage();
-    }
-
-    generatePackMap(): Map<string, PackMapItem> {
-        for(const gitObject of this.gitObjectContainer.looseObjectsContainer.concat(this.gitObjectContainer.packedObjectsContainer)) {
-            const prevHash = gitObject.baseHash ?? '';
-            const currHash = gitObject.hash;
-
-            // update nextHashes
-            if(prevHash && !this._packMap.has(prevHash)) {
-                this._packMap.set(prevHash, {
-                    prevHash: '',
-                    nextHashes: new Set<string>([currHash])
-                });
-            } else if(prevHash && this._packMap.has(prevHash)) {
-                this._packMap.get(prevHash)!.nextHashes.add(currHash);
-            }
-
-            // update prevHash
-            if(!this._packMap.has(currHash)) {
-                this._packMap.set(currHash, {
-                    prevHash: prevHash,
-                    nextHashes: new Set<string>()
-                });
-            } else {
-                this._packMap.get(currHash)!.prevHash = prevHash;
-            }
-        }
-        console.log(`${this._packMap.size} packMap are generated.`);
-        // logMemoryUsage();
-        return this._packMap;
     }
 
     generateEntrance(): void {
@@ -108,7 +71,7 @@ export class ObjectManager {
 
     packMapToJson(): Object[] {
         const json: Object[] = [];
-        for(const [key, {prevHash, nextHashes}] of this._packMap.entries()) {
+        for(const [key, {prevHash, nextHashes}] of this.packMapContainer.packMap.entries()) {
             json.push(
                 {
                     hash: key,
