@@ -58,10 +58,12 @@ export class Entrance {
 
     public entranceFiles: EntranceFile[];
 
-    constructor() {
+    constructor(packedObjects: GitObject[]) {
         this._mapToEntranceNode = new Map<string, EntranceNode>();
         this._mapToEntranceFile = new Map<string, EntranceFile>();
         this.entranceFiles = [];
+
+        this.generateEntrance(packedObjects);
     }
 
     // The gitObject should be a Packed Object
@@ -118,6 +120,13 @@ export class Entrance {
             this.entranceFiles.push(entranceFile);
             this._mapToEntranceFile.set(filePath, entranceFile);
         }
+    }
+
+    public generateEntrance(packedObjects: GitObject[]): void {
+        for(const packedGitObject of packedObjects) {
+            this.insertGitObject(packedGitObject);
+        }
+        console.log(`entrance is generated.`);
     }
 
     parse(outObjectDir?: string) {

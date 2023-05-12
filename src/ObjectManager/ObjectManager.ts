@@ -24,24 +24,10 @@ export class ObjectManager {
 
         this.gitObjectContainer = new GitObjectContainer(this._looseFilePaths, this._packedFilePaths);
         this.packMapContainer = new PackMapContainer(this.gitObjectContainer.looseObjectsContainer);
-        this.entrance = new Entrance();
-        
-        this.generateEntrance();
+        this.entrance = new Entrance(this.gitObjectContainer.packedObjectsContainer);
     }
 
-    generateEntrance(): void {
-        for(const packedGitObject of this.gitObjectContainer.packedObjectsContainer) {
-            this.entrance.insertGitObject(packedGitObject);
-        }
-        console.log(`entrance is generated.`);
-    }
-
-    // TODO: Better to make the input parameter of the looseObjectParser to be the gitObject
     parsePackedObjects() {
-        if(!this.entrance || this.entrance.entranceFiles.length === 0) {
-            this.generateEntrance();
-        }
-
         this.entrance.parse(this._outObjectDir);
     }
 
