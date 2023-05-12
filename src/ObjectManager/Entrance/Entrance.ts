@@ -1,14 +1,14 @@
-import { readFileSync, writeFileSync } from 'fs';
-import { GitObjectType } from '../Enum/GitObjectType';
-import { GitObject } from '../GitObject/GitObject';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { GitObjectType } from '../../Enum/GitObjectType';
 import { inflateSync } from 'zlib';
-import blobParser from './ContentParser/blobParser';
-import treeParser, { GitTreeObjectFileEntry } from './ContentParser/treeParser';
-import commitParser, { CommitObjectInfo } from './ContentParser/commitParser';
-import tagParser, { TagObjectInfo } from './ContentParser/tagParser';
+import blobParser from '../ContentParser/blobParser';
+import treeParser, { GitTreeObjectFileEntry } from '../ContentParser/treeParser';
+import commitParser, { CommitObjectInfo } from '../ContentParser/commitParser';
+import tagParser, { TagObjectInfo } from '../ContentParser/tagParser';
 import path from 'path';
-import { BufferVarint } from '../Buffer/BufferVarint';
-import { isUndeltifiedObject } from '../utils/getGitObjectType';
+import { BufferVarint } from '../../Buffer/BufferVarint';
+import { isUndeltifiedObject } from '../../utils/getGitObjectType';
+import { GitObject } from '../GitObjectContainer/GitObjectContainer';
 
 export interface Distribution {
     filePath: string;
@@ -121,6 +121,10 @@ export class Entrance {
     }
 
     parse(outObjectDir?: string) {
+        if(outObjectDir && !existsSync(outObjectDir)) {
+            mkdirSync(outObjectDir);
+        }
+        
         for (const entranceFile of this.entranceFiles) {
             const filePath = entranceFile.filePath;
             const file = readFileSync(filePath);
