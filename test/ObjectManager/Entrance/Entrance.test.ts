@@ -5,7 +5,7 @@ describe("Test the Entrance class:", () => {
 
     describe("with three undeltified objects and three deltified objects,", () => {
         beforeAll(() => {
-            entrance = new Entrance();
+            entrance = new Entrance([]);
             entrance.insertGitObject((global as any).objectBlobDelta);
             entrance.insertGitObject((global as any).objectDeltifiedBlob);
             entrance.insertGitObject((global as any).objectTreeDelta);
@@ -37,7 +37,7 @@ describe("Test the Entrance class:", () => {
          *                 entranceNode
          */
         beforeAll(() => {
-            entrance = new Entrance();
+            entrance = new Entrance([]);
             entrance.insertGitObject((global as any).duplicatedTreeDelta1);
             entrance.insertGitObject((global as any).duplicatedTreeDelta2);
         });
@@ -67,7 +67,7 @@ describe("Test the Entrance class:", () => {
          *            entranceNode (ref_delta)
          */
         beforeAll(() => {
-            entrance = new Entrance();
+            entrance = new Entrance([]);
             entrance.insertGitObject((global as any).duplicatedTreeDelta1);
             entrance.insertGitObject((global as any).duplicatedTreeDelta2);
             entrance.insertGitObject((global as any).refDelta);
@@ -96,7 +96,7 @@ describe("Test the Entrance class:", () => {
          *
          */
         beforeAll(() => {
-            entrance = new Entrance();
+            entrance = new Entrance([]);
             entrance.insertGitObject((global as any).tagDelta);
             entrance.insertGitObject((global as any).deltifiedTag1);
             entrance.insertGitObject((global as any).deltifiedTag2);
