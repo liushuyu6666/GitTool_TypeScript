@@ -10,6 +10,8 @@ build/
 
 # test case
 testCases/prodExample
+**/__snapshots__/
+
 
 # out dir
 outDir/

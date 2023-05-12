@@ -1,10 +1,8 @@
-import { Entrance } from "../Entrance/Entrance";
+import { Entrance } from "./Entrance";
 import { GitObject } from "../GitObject/GitObject";
 import { isLooseObject } from "../utils/getGitObjectType";
 import { LooseObjectGenerator } from "./ObjectGenerator/LooseObjectGenerator";
 import { PackedObjectsGenerator } from "./ObjectGenerator/PackedObjectsGenerator";
-import parseAndSaveLooseObject from "./ContentParser/parseAndSaveLooseObject";
-import entranceFileParser from "./ContentParser/entranceFileParser";
 
 export interface PackMapItem {
     prevHash: string;
@@ -116,24 +114,12 @@ export class ObjectManager {
     }
 
     // TODO: Better to make the input parameter of the looseObjectParser to be the gitObject
-    parseAllContents() {
-        if(!this._outObjectDir) {
-            console.error('outObjectDir is not specified!');
-            return;
-        }
+    parsePackedObjects() {
         if(!this.entrance || this.entrance.entranceFiles.length === 0) {
             this.generateEntrance();
         }
 
-        // Parse loose objects
-        for(const gitObject of this._gitObjects) {
-            parseAndSaveLooseObject(gitObject, this._outObjectDir);
-        }
-
-        // Parse packed objects
-        for(const entranceFile of this.entrance.entranceFiles) {
-            entranceFileParser(entranceFile, this._outObjectDir);
-        }
+        this.entrance.parse(this._outObjectDir);
     }
 
     gitObjectToJson(): Object[] {
