@@ -41,6 +41,9 @@ export default function() {
     (global as any).fakePackedFilePaths = packedFilePaths;
     (global as any).fakeLooseFilePaths = prodLooseFilePaths;
     (global as any).outDir = outDir;
+
+    (global as any).fakeCommits = JSON.parse(readFileSync('test/fixture/mock_commits.json', 'utf8'));
+
 }
 
 interface FakeObject {

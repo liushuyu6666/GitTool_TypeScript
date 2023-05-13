@@ -11,11 +11,15 @@ export interface CommitHash {
     parentHashes: string[];
 }
 
-export interface CommitObjectInfo {
-    hashes: CommitHash;
+export interface CommitInfo {
     author: PersonalInfo;
     committer: PersonalInfo;
     message: string;
+}
+
+export interface CommitObjectInfo {
+    hashes: CommitHash;
+    info: CommitInfo;
 }
 
 export default function(body: Buffer, hash: string): CommitObjectInfo {
@@ -99,18 +103,20 @@ export default function(body: Buffer, hash: string): CommitObjectInfo {
             parentHashes,
             hash
         },
-        author: {
-            name: authorName,
-            email: authorEmail,
-            timestamp: authorTimestamp,
-            timezone: authorTimezone,
-        },
-        committer: {
-            name: committerName,
-            email: committerEmail,
-            timestamp: committerTimestamp,
-            timezone: committerTimezone,
-        },
-        message,
+        info: {
+            author: {
+                name: authorName,
+                email: authorEmail,
+                timestamp: authorTimestamp,
+                timezone: authorTimezone,
+            },
+            committer: {
+                name: committerName,
+                email: committerEmail,
+                timestamp: committerTimestamp,
+                timezone: committerTimezone,
+            },
+            message,
+        }
     };
 }
