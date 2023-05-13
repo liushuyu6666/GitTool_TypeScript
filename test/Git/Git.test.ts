@@ -10,8 +10,9 @@ describe("Test Git class", () => {
             git = new Git('testCases/prodExample/git', '');
         });
 
-        test("The method inflation should save objects into mongodb", () => {
-            git.inflation();
+        test("The method saveGitObjectToMongodb should save objects into mongodb", async () => {
+            await git.saveGitObjectToMongodb();
+            await git.savePackMapToMongodb();
         })
     })
 })

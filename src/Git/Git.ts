@@ -1,25 +1,40 @@
+import { MongoClient } from "mongodb";
 import { FileManager } from "../FileManager/FileManager";
 import { ObjectManager } from "../ObjectManager/ObjectManager";
 
-export class Git {
-    private _fileManager: FileManager;
+// TODO: move dotenv variables to the configuration manager
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 
-    private _objectManager: ObjectManager;
+export class Git {
+    public fileManager: FileManager;
+
+    public objectManager: ObjectManager;
 
     constructor(inDir: string, outDir: string) {
-        this._fileManager = new FileManager(inDir, outDir);
-        const looseFilePaths = this._fileManager.getLooseFilePaths();
-        const packedFilePaths = this._fileManager.getPackedFilePaths();
-        this._objectManager = new ObjectManager(looseFilePaths, packedFilePaths);
+        this.fileManager = new FileManager(inDir, outDir);
+        const looseFilePaths = this.fileManager.inDir.looseFilePaths;
+        const packedFilePaths = this.fileManager.inDir.packedFilePaths;
+        this.objectManager = new ObjectManager(looseFilePaths, packedFilePaths);
     }
 
-    inflation() {
-        this._objectManager.generateGitObjects();
-        const gitObjectsJson = this._objectManager.gitObjectToJson();
-        this._fileManager.saveJsonToMongodb('gitObjects', gitObjectsJson);
+    public async saveGitObjectToMongodb() {
+        // TODO: should move to configuration
+        // TODO: should check if we need a wrapper function to wrap all functions which need to use the mongodb.
+        const mongoUri = process.env.MONGO_URI ?? '';
+        const mongoClient = await MongoClient.connect(mongoUri);
+        const json = this.objectManager.gitObjectToJson();
 
-        this._objectManager.generatePackMap();
-        const packMapJson = this._objectManager.packMapToJson();
-        this._fileManager.saveJsonToMongodb('packMap', packMapJson);
+        this.fileManager.saveJsonToMongodb(mongoClient, 'gitObjects', json);
+    }
+
+    public async savePackMapToMongodb() {
+        // TODO: should move to configuration
+        // TODO: should check if we need a wrapper function to wrap all functions which need to use the mongodb.
+        const mongoUri = process.env.MONGO_URI ?? '';
+        const mongoClient = await MongoClient.connect(mongoUri);
+        const json = this.objectManager.packMapToJson();
+
+        this.fileManager.saveJsonToMongodb(mongoClient, 'packMap', json);
     }
 }

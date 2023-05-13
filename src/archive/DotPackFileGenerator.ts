@@ -5,8 +5,8 @@ import { Offset } from './Fanout';
 import { GitObjectType } from '../Enum/GitObjectType';
 import { BufferVarint } from '../Buffer/BufferVarint';
 import getGitObjectType from '../utils/getGitObjectType';
-import { GitObject } from '../GitObject/GitObject';
 import swapKeyAndValueInRecords from '../utils/swapKeyAndValueInRecords';
+import { GitObject } from '../ObjectManager/GitObjectContainer/GitObjectContainer';
 
 // TODO: Archive this class as all logic had been moved to PackedObjectsGenerator
 

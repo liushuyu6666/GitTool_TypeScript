@@ -1,5 +1,4 @@
 import exactMatchArray from "../utils/exactMatchArray";
-import { FileManagerInterface } from "./FileManagerInterface";
 import { MongoClient } from 'mongodb';
 import path from 'path';
 import fs from 'fs';
@@ -8,15 +7,36 @@ import fs from 'fs';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
-export class FileManager implements FileManagerInterface {
-    private _inDir: string;
-    private _outDir: string;
-    public objectPath: string;
+export interface OutDirInterface {
+    outRoot: string;
+    outObjectPath: string;
+}
+
+export interface InDirInterface {
+    inRoot: string;
+    inObjectPath: string;
+    looseFilePaths: string[];
+    packedFilePaths: string[];
+}
+
+export class FileManager {
+    public inDir: InDirInterface;
+    public outDir: OutDirInterface;
 
     constructor(inDir: string, outDir: string) {
-        this._inDir = inDir;
-        this._outDir = outDir;
-        this.objectPath = path.join(this._inDir, 'objects');
+        const inObjectPath = path.join(inDir, 'objects');
+        const outObjectPath = path.join(outDir, 'objects');
+        
+        this.inDir = {
+            inRoot: inDir,
+            inObjectPath,
+            looseFilePaths: this.getLooseFilePaths(inObjectPath),
+            packedFilePaths: this.getPackedFilePaths(inObjectPath)
+        };
+        this.outDir = {
+            outRoot: outDir,
+            outObjectPath
+        }
     }
     
     /**
@@ -26,8 +46,7 @@ export class FileManager implements FileManagerInterface {
      * @param filterRegexToExclude An array of all directory names to exclude.
      * @returns 
     */
-    private listAllSubordinatesDFS(dir: string, filePaths: string[], filterRegexToExclude: RegExp[]): string[] {
-        this._outDir;
+    private _listAllSubordinatesDFS(dir: string, filePaths: string[], filterRegexToExclude: RegExp[]): string[] {
         const currFolder = dir.split(path.sep).pop();
         if (currFolder && exactMatchArray(currFolder, filterRegexToExclude)) {
             return filePaths;
@@ -49,19 +68,19 @@ export class FileManager implements FileManagerInterface {
         for (let i = 0; i < dirs.length; i++) {
             const sub = dirs[i];
             const currDir = path.join(dir, sub.name);
-            filePaths = this.listAllSubordinatesDFS(currDir, filePaths, filterRegexToExclude);
+            filePaths = this._listAllSubordinatesDFS(currDir, filePaths, filterRegexToExclude);
         }
     
         return filePaths;
     }
 
-    public getLooseFilePaths(): string[] {
-        return this.listAllSubordinatesDFS(this.objectPath, [], [/^info$/, /^pack$/]);
+    public getLooseFilePaths(objectPath: string): string[] {
+        return this._listAllSubordinatesDFS(objectPath, [], [/^info$/, /^pack$/]);
     }
 
-    public getPackedFilePaths(): string[] {
-        const files = this.listAllSubordinatesDFS(
-            this.objectPath,
+    public getPackedFilePaths(objectPath: string): string[] {
+        const files = this._listAllSubordinatesDFS(
+            objectPath,
             [],
             [/^info$/, /^[0-9a-z]{2}$/],
         );
@@ -76,12 +95,20 @@ export class FileManager implements FileManagerInterface {
         return Array.from(set.values());
     }
 
-    public async saveJsonToMongodb(colName: string, json: any) {
-        const mongoUri = process.env.MONGO_URI ?? '';
-        const client = await MongoClient.connect(mongoUri);
-        const db = client.db();
+    public async saveJsonToMongodb(mongoClient: MongoClient, colName: string, json: any) {
+        const db = mongoClient.db();
+        if(!this._hasCollection(mongoClient, colName)) {
+            await db.createCollection(colName);
+        } else {
+            await db.collection(colName).deleteMany({});
+        }
         const collection = db.collection(colName);
         await collection.insertMany(json);
-        await client.close();
+        await mongoClient.close();
+    }
+
+    private async _hasCollection(mongoClient: MongoClient, colName: string): Promise<boolean> {
+        const colList = await mongoClient.db().listCollections().toArray();
+        return colList.filter((col) => col.name === colName).length > 0;
     }
 }
