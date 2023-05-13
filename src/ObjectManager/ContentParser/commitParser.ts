@@ -6,18 +6,19 @@ export interface PersonalInfo {
 }
 
 export interface CommitHash {
+    hash: string;
     treeHash: string;
     parentHashes: string[];
 }
 
 export interface CommitObjectInfo {
-    hash: CommitHash;
+    hashes: CommitHash;
     author: PersonalInfo;
     committer: PersonalInfo;
     message: string;
 }
 
-export default function(body: Buffer): CommitObjectInfo {
+export default function(body: Buffer, hash: string): CommitObjectInfo {
     const content = body.toString();
 
     // get tree object hash
@@ -93,9 +94,10 @@ export default function(body: Buffer): CommitObjectInfo {
     const message = messageTemp ? messageTemp[1] : '';
 
     return {
-        hash: {
+        hashes: {
             treeHash,
             parentHashes,
+            hash
         },
         author: {
             name: authorName,

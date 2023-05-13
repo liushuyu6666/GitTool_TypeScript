@@ -227,9 +227,8 @@ export class Entrance {
         }
 
         // 4, Print to the specified outDir.
+        const outFile = this._undeltifiedParser(newBuffer, baseType, node.hash);
         if (outObjectDir) {
-            const outFile = this._undeltifiedParser(newBuffer, baseType);
-            
             // TODO: ensure the baseType keeps the same as its grandparent.
             let outStr: string;
             if(typeof outFile === 'string') {
@@ -264,6 +263,7 @@ export class Entrance {
     private _undeltifiedParser(
         decryptedBuf: Buffer,
         type: GitObjectType,
+        hash: string
     ):
         | string
         | GitTreeObjectFileEntry[]
@@ -278,7 +278,7 @@ export class Entrance {
                 return treeParser(decryptedBuf);
             }
             case GitObjectType.COMMIT_DELTA: {
-                return commitParser(decryptedBuf);
+                return commitParser(decryptedBuf, hash);
             }
             case GitObjectType.TAG_DELTA: {
                 return tagParser(decryptedBuf);
