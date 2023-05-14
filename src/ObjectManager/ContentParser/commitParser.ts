@@ -1,3 +1,6 @@
+import { TagObjectInfo } from "./tagParser";
+import { GitTreeObjectFileEntry } from "./treeParser";
+
 export interface PersonalInfo {
     name: string;
     email: string;
@@ -119,4 +122,9 @@ export default function(body: Buffer, hash: string): CommitObjectInfo {
             message,
         }
     };
+}
+
+export function isCommitObjectInfo(outFile: string | CommitObjectInfo | GitTreeObjectFileEntry[] | TagObjectInfo | undefined): outFile is CommitObjectInfo {
+    if (!(outFile as CommitObjectInfo).hashes || !(outFile as CommitObjectInfo).info) return false;
+    return true;
 }

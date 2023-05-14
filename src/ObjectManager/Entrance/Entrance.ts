@@ -5,12 +5,13 @@ import blobParser from '../ContentParser/blobParser';
 import treeParser, {
     GitTreeObjectFileEntry,
 } from '../ContentParser/treeParser';
-import commitParser, { CommitObjectInfo } from '../ContentParser/commitParser';
+import commitParser, { CommitObjectInfo, isCommitObjectInfo } from '../ContentParser/commitParser';
 import tagParser, { TagObjectInfo } from '../ContentParser/tagParser';
 import path from 'path';
 import { BufferVarint } from '../../Buffer/BufferVarint';
 import { isUndeltifiedObject } from '../../utils/getGitObjectType';
 import { GitObject } from '../GitObjectContainer/GitObjectContainer';
+import { CommitMap } from '../CommitMap/CommitMap';
 
 export interface Distribution {
     filePath: string;
@@ -134,7 +135,7 @@ export class Entrance {
         console.log(`entrance is generated.`);
     }
 
-    parsePackedObjects(outObjectDir?: string) {
+    parsePackedObjects(commitMap: CommitMap, outObjectDir?: string) {
         if (outObjectDir && !existsSync(outObjectDir)) {
             mkdirSync(outObjectDir);
         }
@@ -152,6 +153,7 @@ export class Entrance {
                         filePath,
                         file,
                         undeltifiedType,
+                        commitMap,
                         outObjectDir,
                     );
                 } catch (e) {
@@ -164,7 +166,7 @@ export class Entrance {
         }
     }
 
-    public parseLooseObjects(outObjectDir?: string): void {
+    public parseLooseObjects(commitMap: CommitMap, outObjectDir?: string): void {
         if (!this.looseObjects) return;
         if (outObjectDir && !existsSync(outObjectDir)) {
             mkdirSync(outObjectDir);
@@ -177,6 +179,9 @@ export class Entrance {
             const body = decryptedBuf.subarray(startIdx, endIdx);
             const outFile = this._undeltifiedParser(body, gitObjectType, hash);
 
+            if(isCommitObjectInfo(outFile)) {
+                commitMap.insertCommitObjectInfo(outFile);
+            }
             this._printToOutObjectDir(outFile, hash, outObjectDir);
         }
     }
@@ -209,8 +214,9 @@ export class Entrance {
         filePath: string,
         file: Buffer,
         baseType: GitObjectType, // must be an undeltified type for the undeltifiedParser to parse.
+        commitMap: CommitMap,
         outObjectDir?: string,
-        baseBuffer?: Buffer,
+        baseBuffer?: Buffer
     ) {
         // 1, Get the body through the shortest distribution or the first distribution
         let body: Buffer;
@@ -248,17 +254,25 @@ export class Entrance {
             newBuffer = deltaBuffer;
         }
 
-        // 4, Print to the specified outDir.
+        // 4, Parse.
         const outFile = this._undeltifiedParser(newBuffer, baseType, node.hash);
+
+        // 5, Print to the Object Dir
         this._printToOutObjectDir(outFile, node.hash, outObjectDir);
 
-        // 5, Next node, the newBuffer will be the next BaseBuffer.
+        // 6, Insert into the CommitMap
+        if(isCommitObjectInfo(outFile)) {
+            commitMap.insertCommitObjectInfo(outFile);
+        }
+
+        // 7, Next node, the newBuffer will be the next BaseBuffer.
         for (const nextNode of node.nextNodes) {
             this._dfsParser(
                 nextNode,
                 filePath,
                 file,
                 baseType,
+                commitMap,
                 outObjectDir,
                 newBuffer,
             );

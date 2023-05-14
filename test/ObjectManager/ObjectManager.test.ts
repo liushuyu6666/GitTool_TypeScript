@@ -33,8 +33,11 @@ describe('Test ObjectManager class', () => {
             expect(objectManager.entrance.entranceFiles.length).toBe(16);
         });
 
-        test('parseContent method should parse all objects properly and store them in the right folder.', () => {
+        test('all objects are parsed and stored, the commitMap is generated.', () => {
             objectManager.parseObjects();
+            expect(objectManager.commitMap.commitHeader.firstNode.length).toBe(1);
+            expect(objectManager.commitMap.commitHeader.firstNode[0].hash).toBe("c498716c1d2906ce9d54e50ee56d05bc64f543ba");
+            expect(objectManager.commitMap.commitInfoMap.size).toBe(2210);
         });
     });
 });

@@ -1,3 +1,4 @@
+import { CommitMap } from "./CommitMap/CommitMap";
 import { Entrance } from "./Entrance/Entrance";
 import { GitObjectContainer } from "./GitObjectContainer/GitObjectContainer";
 import { PackMapContainer } from "./PackMap/PackMapContainer";
@@ -17,6 +18,8 @@ export class ObjectManager {
 
     public packMapContainer: PackMapContainer;
 
+    public commitMap: CommitMap;
+
     constructor(looseFilePaths: string[], packedFilePaths: string[], outObjectDir?: string) {
         this._looseFilePaths = looseFilePaths;
         this._packedFilePaths = packedFilePaths;
@@ -25,11 +28,12 @@ export class ObjectManager {
         this.gitObjectContainer = new GitObjectContainer(this._looseFilePaths, this._packedFilePaths);
         this.packMapContainer = new PackMapContainer(this.gitObjectContainer.allObjectsContainer);
         this.entrance = new Entrance(this.gitObjectContainer.packedObjectsContainer, this.gitObjectContainer.looseObjectsContainer);
+        this.commitMap = new CommitMap();
     }
 
     parseObjects() {
-        this.entrance.parsePackedObjects(this._outObjectDir);
-        this.entrance.parseLooseObjects(this._outObjectDir);
+        this.entrance.parsePackedObjects(this.commitMap, this._outObjectDir);
+        this.entrance.parseLooseObjects(this.commitMap, this._outObjectDir);
     }
 
     gitObjectToJson(): Object[] {
