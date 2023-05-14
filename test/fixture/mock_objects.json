@@ -106,5 +106,14 @@
         "startIdx": 10048,
         "endIdx": 10102,
         "type": "ofs_delta"
+    },
+    "tree": {
+        "hash": "002347d69382228ec27dcee12b5c6c96ba17a94d",
+        "baseHash": null,
+        "size": 178,
+        "filePath": "testCases/prodExample/git/objects/00/2347d69382228ec27dcee12b5c6c96ba17a94d",
+        "startIdx": 9,
+        "endIdx": 187,
+        "type": "tree"
     }
 }

@@ -34,7 +34,7 @@ describe('Test ObjectManager class', () => {
         });
 
         test('parseContent method should parse all objects properly and store them in the right folder.', () => {
-            objectManager.parsePackedObjects();
+            objectManager.parseObjects();
         });
     });
 });

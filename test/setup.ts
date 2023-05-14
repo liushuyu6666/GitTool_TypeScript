@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import { GitObjectType } from "../src/Enum/GitObjectType";
 import { GitObject } from "../src/ObjectManager/GitObjectContainer/GitObjectContainer";
+import { inflateSync } from "zlib";
 
 export default function() {
     // TODO: should be configured in the .env
@@ -12,6 +13,7 @@ export default function() {
     (global as any).fakeDeltifiedBlob = getFakeObject(fakeObjects['deltified_blob']);
     (global as any).fakeDeltifiedTree = getFakeObject(fakeObjects['deltified_tree']);
     (global as any).fakeDeltifiedCommit = getFakeObject(fakeObjects['deltified_commit']);
+    (global as any).fakeTree = getFakeLooseObject(fakeObjects['tree']);
 
     (global as any).objectBlobDelta = generateGitObject(fakeObjects['blob_delta']);
     (global as any).objectTreeDelta = generateGitObject(fakeObjects['tree_delta']);
@@ -56,12 +58,23 @@ interface FakeObject {
     endIdx: number;
 }
 
-function getFakeObject (object: FakeObject) {
+function getFakeObject (object: FakeObject): Buffer {
     const filePath = object.filePath;
     const startIdx = object.startIdx;
     const endIdx = object.endIdx;
     const content = readFileSync(filePath);
     return content.subarray(startIdx, endIdx);
+}
+
+function getFakeLooseObject(object: FakeObject): Buffer {
+    const {
+        filePath,
+        startIdx,
+        endIdx
+    } = object;
+    const file = readFileSync(filePath);
+    const decryptedBuf = inflateSync(file);
+    return decryptedBuf.subarray(startIdx, endIdx);
 }
 
 function generateGitObject (object: FakeObject) {

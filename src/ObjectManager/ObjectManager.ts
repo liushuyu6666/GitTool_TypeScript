@@ -24,11 +24,12 @@ export class ObjectManager {
 
         this.gitObjectContainer = new GitObjectContainer(this._looseFilePaths, this._packedFilePaths);
         this.packMapContainer = new PackMapContainer(this.gitObjectContainer.allObjectsContainer);
-        this.entrance = new Entrance(this.gitObjectContainer.packedObjectsContainer);
+        this.entrance = new Entrance(this.gitObjectContainer.packedObjectsContainer, this.gitObjectContainer.looseObjectsContainer);
     }
 
-    parsePackedObjects() {
-        this.entrance.parse(this._outObjectDir);
+    parseObjects() {
+        this.entrance.parsePackedObjects(this._outObjectDir);
+        this.entrance.parseLooseObjects(this._outObjectDir);
     }
 
     gitObjectToJson(): Object[] {

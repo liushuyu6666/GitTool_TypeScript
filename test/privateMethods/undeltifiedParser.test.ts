@@ -8,7 +8,7 @@ describe('Test the undeltifiedParser method in the Entrance class,', () => {
     test('for parsing blob_delta object', () => {
         const fakeBlobDelta: Buffer = (global as any).fakeBlobDelta;
         const decryptedBuf = inflateSync(fakeBlobDelta);
-        const data = undeltifiedParser(decryptedBuf, GitObjectType.BLOB_DELTA) as any as string;
+        const data = undeltifiedParser(decryptedBuf, GitObjectType.BLOB_DELTA, 'fakeHash') as any as string;
 
         expect(data.substring(0, 26)).toBe(`import 'isomorphic-fetch';`);
     });
@@ -16,7 +16,7 @@ describe('Test the undeltifiedParser method in the Entrance class,', () => {
     test('for parsing tree_delta object', () => {
         const fakeTreeDelta: Buffer = (global as any).fakeTreeDelta;
         const decryptedBuf = inflateSync(fakeTreeDelta);
-        const data = undeltifiedParser(decryptedBuf, GitObjectType.TREE_DELTA) as any as GitTreeObjectFileEntry[];
+        const data = undeltifiedParser(decryptedBuf, GitObjectType.TREE_DELTA, 'fakeHash') as any as GitTreeObjectFileEntry[];
 
         expect(data).toMatchSnapshot();
     });
@@ -24,8 +24,15 @@ describe('Test the undeltifiedParser method in the Entrance class,', () => {
     test('for parsing commit_delta object', () => {
         const fakeCommitDelta: Buffer = (global as any).fakeCommitDelta;
         const decryptedBuf = inflateSync(fakeCommitDelta);
-        const data = undeltifiedParser(decryptedBuf, GitObjectType.COMMIT_DELTA) as any as CommitObjectInfo;
+        const data = undeltifiedParser(decryptedBuf, GitObjectType.COMMIT_DELTA, 'fakeHash') as any as CommitObjectInfo;
 
         expect(data).toMatchSnapshot();
     });
+
+    test('for parsing tree object', () => {
+        const fakeTree = (global as any).fakeTree;
+        const data = undeltifiedParser(fakeTree, GitObjectType.TREE, 'fakeHash') as any as GitTreeObjectFileEntry[];
+
+        expect(data).toMatchSnapshot();
+    })
 })

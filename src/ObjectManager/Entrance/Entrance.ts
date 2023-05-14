@@ -2,7 +2,9 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { GitObjectType } from '../../Enum/GitObjectType';
 import { inflateSync } from 'zlib';
 import blobParser from '../ContentParser/blobParser';
-import treeParser, { GitTreeObjectFileEntry } from '../ContentParser/treeParser';
+import treeParser, {
+    GitTreeObjectFileEntry,
+} from '../ContentParser/treeParser';
 import commitParser, { CommitObjectInfo } from '../ContentParser/commitParser';
 import tagParser, { TagObjectInfo } from '../ContentParser/tagParser';
 import path from 'path';
@@ -58,10 +60,13 @@ export class Entrance {
 
     public entranceFiles: EntranceFile[];
 
-    constructor(packedObjects: GitObject[]) {
+    public looseObjects: GitObject[] | undefined;
+
+    constructor(packedObjects: GitObject[], looseObjects?: GitObject[]) {
         this._mapToEntranceNode = new Map<string, EntranceNode>();
         this._mapToEntranceFile = new Map<string, EntranceFile>();
         this.entranceFiles = [];
+        this.looseObjects = looseObjects;
 
         this.generateEntrance(packedObjects);
     }
@@ -123,17 +128,17 @@ export class Entrance {
     }
 
     public generateEntrance(packedObjects: GitObject[]): void {
-        for(const packedGitObject of packedObjects) {
+        for (const packedGitObject of packedObjects) {
             this.insertGitObject(packedGitObject);
         }
         console.log(`entrance is generated.`);
     }
 
-    parse(outObjectDir?: string) {
-        if(outObjectDir && !existsSync(outObjectDir)) {
+    parsePackedObjects(outObjectDir?: string) {
+        if (outObjectDir && !existsSync(outObjectDir)) {
             mkdirSync(outObjectDir);
         }
-        
+
         for (const entranceFile of this.entranceFiles) {
             const filePath = entranceFile.filePath;
             const file = readFileSync(filePath);
@@ -159,6 +164,23 @@ export class Entrance {
         }
     }
 
+    public parseLooseObjects(outObjectDir?: string): void {
+        if (!this.looseObjects) return;
+        if (outObjectDir && !existsSync(outObjectDir)) {
+            mkdirSync(outObjectDir);
+        }
+        for (const gitObject of this.looseObjects) {
+            const { hash, filePath, startIdx, endIdx, gitObjectType } =
+                gitObject;
+            const file = readFileSync(filePath);
+            const decryptedBuf = inflateSync(file);
+            const body = decryptedBuf.subarray(startIdx, endIdx);
+            const outFile = this._undeltifiedParser(body, gitObjectType, hash);
+
+            this._printToOutObjectDir(outFile, hash, outObjectDir);
+        }
+    }
+
     private _getUndeltifiedType(distributions: Distribution[]): GitObjectType {
         const distribution = distributions.find((dis) =>
             isUndeltifiedObject(dis.type),
@@ -173,14 +195,14 @@ export class Entrance {
     }
 
     /**
-     * 
+     *
      * @param node The entranceNode of the current object.
      * @param filePath The file path of its connected entranceFile.
      * @param file The file buffer read from the associated file path.
-     * @param baseType The base type of the current object, can be 
-     * @param outObjectDir 
-     * @param baseBuffer 
-     * @returns 
+     * @param baseType The base type of the current object, can be
+     * @param outObjectDir
+     * @param baseBuffer
+     * @returns
      */
     private _dfsParser(
         node: EntranceNode,
@@ -228,22 +250,7 @@ export class Entrance {
 
         // 4, Print to the specified outDir.
         const outFile = this._undeltifiedParser(newBuffer, baseType, node.hash);
-        if (outObjectDir) {
-            // TODO: ensure the baseType keeps the same as its grandparent.
-            let outStr: string;
-            if(typeof outFile === 'string') {
-                outStr = outFile;
-            } else {
-                outStr = JSON.stringify(
-                    outFile,
-                    null,
-                    4,
-                );
-            }
-
-            const outFilePath = path.join(outObjectDir, node.hash);
-            writeFileSync(outFilePath, outStr);
-        }
+        this._printToOutObjectDir(outFile, node.hash, outObjectDir);
 
         // 5, Next node, the newBuffer will be the next BaseBuffer.
         for (const nextNode of node.nextNodes) {
@@ -263,7 +270,7 @@ export class Entrance {
     private _undeltifiedParser(
         decryptedBuf: Buffer,
         type: GitObjectType,
-        hash: string
+        hash: string,
     ):
         | string
         | GitTreeObjectFileEntry[]
@@ -271,15 +278,19 @@ export class Entrance {
         | TagObjectInfo
         | undefined {
         switch (type) {
+            case GitObjectType.BLOB:
             case GitObjectType.BLOB_DELTA: {
                 return blobParser(decryptedBuf);
             }
+            case GitObjectType.TREE:
             case GitObjectType.TREE_DELTA: {
                 return treeParser(decryptedBuf);
             }
+            case GitObjectType.COMMIT:
             case GitObjectType.COMMIT_DELTA: {
                 return commitParser(decryptedBuf, hash);
             }
+            case GitObjectType.TAG:
             case GitObjectType.TAG_DELTA: {
                 return tagParser(decryptedBuf);
             }
@@ -334,5 +345,30 @@ export class Entrance {
         }
 
         return [baseObjectSize, deltifiedObjectSize, finalBuffer];
+    }
+
+    private _printToOutObjectDir(
+        outFile:
+            | string
+            | GitTreeObjectFileEntry[]
+            | CommitObjectInfo
+            | TagObjectInfo
+            | undefined,
+        hash: string,
+        outObjectDir?: string
+    ) {
+        // TODO: log if outFile is undefined
+        if (outObjectDir) {
+            // TODO: ensure the baseType keeps the same as its grandparent.
+            let outStr: string;
+            if (typeof outFile === 'string') {
+                outStr = outFile;
+            } else {
+                outStr = JSON.stringify(outFile, null, 4);
+            }
+
+            const outFilePath = path.join(outObjectDir, hash);
+            writeFileSync(outFilePath, outStr);
+        }
     }
 }
