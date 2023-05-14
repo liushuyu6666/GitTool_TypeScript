@@ -16,6 +16,8 @@
 
 
 ## `Entrance`
+Although `Entrance` supports parsing both packed and loose git objects, its focus is mainly on parsing packed objects due to their complexity and inter-dependency.  
+
 Each packed git object is either `undeltified` or `deltified`, where `deltified` objects have a delta content that depends on a base object for reconstruction. `Entrance` records the dependency relationship of all packed git objects to optimize parsing. 
 
 The `Entrance` begins with multiple `EntranceFiles`, each of which records the path of one `.pack` file and its `undeltified` objects as child nodes in the `EntranceNode` data structure. Each `EntranceNode` records the necessary information for parsing, as well as its child nodes, which are also stored as `EntranceNode` data structures. Packed git objects are organized in this manner. Two things to note are that:
@@ -25,7 +27,8 @@ The `Entrance` begins with multiple `EntranceFiles`, each of which records the p
 The `Entrance` is designed to parse packed objects using minimal time and memory. To accomplish this, we should read the `.pack` file as less as possible. By observation, we know that
 1. `connected`: If an object is connected to `EntranceFile_A`, it means that its grandparent is `EntranceFile_A`, and it can be parsed by starting from `EntranceFile_A`. However, one `deltified` object connected to `EntranceFile_A` might not be stored in `A.pack`. Meanwhile,
 2. `stored`: a stored `deltified` object might not be connected to `EntranceFile_A`.
-We should start from the `EntranceFile` and read its associated `.pack` file once, parsing all its connected objects stored in it. Then, we can read other `.pack` files to parse the rest. For objects with multiple distributions, we need to find the `shortestDistribution` stored in the current `.pack` file to avoid reading a new `.pack` file. A `parsedSet` set is also needed to record all parsed objects.
+We should start from the `EntranceFile` and read its associated `.pack` file once, parsing all its connected objects stored in it. Then, we can read other `.pack` files to parse the rest. For objects with multiple distributions, we need to find the `shortestDistribution` stored in the current `.pack` file to avoid reading a new `.pack` file.
+1. Both `_mapToEntranceNode` and `_mapToEntranceFile` serve the purpose of preventing duplicate `EntranceNode` or `EntranceFile`.
 
 
 # Chatgpt answer
